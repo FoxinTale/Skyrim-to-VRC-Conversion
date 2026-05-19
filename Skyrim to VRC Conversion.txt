@@ -1,0 +1,25 @@
+For the models:
+Blender 3.4.1
+Blender niftools: https://github.com/niftools/blender_niftools_addon/releases/download/v0.1.1/blender_niftools_addon-v0.1.1-2023-11-03-0305c8d5.zip
+Bethesda Archive Extractor: https://www.nexusmods.com/skyrimspecialedition/mods/974
+Animation tools: https://www.nexusmods.com/skyrim/mods/30162
+
+For the textures:
+Paint.net.
+XNormal
+GIMP
+
+This does assume you know the basic controls of Blender (controls), and basic computer knowledge.
+-----------
+
+Overarching steps:
+
+Extract / get the models we want to use and setup folders.
+
+Fixing the skeleton
+
+Converting the textures
+
+The head:
+	extracting the tris
+	Setting up the tris
