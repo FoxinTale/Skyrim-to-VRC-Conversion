@@ -9,17 +9,33 @@ Paint.net.
 XNormal
 GIMP
 
-This does assume you know the basic controls of Blender (controls), and basic computer knowledge.
+Other, general tools:
+x/SSE Edit.
+
+
+This does assume you know the basic controls of Blender (controls), and basic computer knowledge. And know basic anatomy. Yes, I'm serious.
 -----------
 
 Overarching steps:
 
 Extract / get the models we want to use and setup folders.
+	Running Bethesda Archive Extractor.
 
 Fixing the skeleton
+	Linking all the bones together, moving as needed and running the rename script.
 
 Converting the textures
+	Using XNormal
 
 The head:
 	extracting the tris
 	Setting up the tris
+	Cover the case where it freaks out on the vertexes.
+
+
+
+-----------
+Maybe, once this is good for final release, re-structure the folders.
+- Blender Scripts
+- Tri extractor
+- Guide (further broken down)
