@@ -2,11 +2,13 @@ from pathlib import Path
 
 from TriParser import read_tri, get_shape_vertex_requirement
 from NifParser import read_nif_shapes
-
+from NifParser import validate_faces
+from ObjWriter import write_obj
 
 def main():
     nif_path = Path(r"outfit.nif")
     tri_path = Path(r"lingerie.tri")
+    out_path = r"debug_vertices.obj"
 
     nif_shapes = read_nif_shapes(nif_path)
     tri_shapes, has_uv = read_tri(tri_path)
@@ -16,7 +18,7 @@ def main():
     nif_by_name = {s["name"]: s for s in nif_shapes}
     tri_by_name = {s["name"]: s for s in tri_shapes}
 
-    print("\n=== Shape Match Report ===")
+#    print("\n=== Shape Match Report ===")
 
     for name, nif_shape in nif_by_name.items():
         tri_shape = tri_by_name.get(name)
@@ -30,12 +32,47 @@ def main():
 
         status = "MATCH" if required == actual else "MISMATCH"
 
-        print(
-            f"{name}: "
-            f"NIF vertices={actual}, "
-            f"TRI requires={required} "
-            f"[{status}]"
+#        print(
+#            f"{name}: "
+#            f"NIF vertices={actual}, "
+#            f"TRI requires={required} "
+#            f"[{status}]"
+#        )
+        
+#        for shape in nif_shapes:
+#            validate_faces(
+#                shape["vertices"],
+#                shape["faces"],
+#                shape["name"]
+#            )
+#            print(
+#                f"{shape['name']}: "
+#                f"{len(shape['vertices'])} verts, "
+#                f"{len(shape['faces'])} faces"
+#            )
+            
+            
+        first_shape = nif_shapes[0]
+
+        write_obj(
+            r"test_mesh.obj",
+            first_shape["vertices"],
+            first_shape["faces"],
+            object_name=first_shape["name"],
         )
+        
+
+print("Wrote test mesh OBJ.")
+                
+#        first_shape = nif_shapes[0]
+
+#        write_vertices_only_obj(
+#            out_path,
+#            first_shape["vertices"],
+#            object_name=first_shape["name"],
+#        )
+
+#        print(f"Wrote debug OBJ: {out_path}")
         
         
 def report_shape_details(nif_shapes, tri_shapes, get_shape_vertex_requirement):
@@ -61,7 +98,8 @@ def report_shape_details(nif_shapes, tri_shapes, get_shape_vertex_requirement):
                 print(
                     f"    partition {p['partition_index']}: "
                     f"{p['vertex_count']} verts, "
-                    f"stride {p['vertex_stride']}"
+                    f"{p['triangle_count']} triangles, "
+                    f"{p['bone_count']} bones"
                 )
 
         tri_shape = tri_by_name.get(name)
