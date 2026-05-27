@@ -13,6 +13,9 @@ DIV_BELLY = "----- Belly -----"
 DIV_BREASTS = "----- Breasts -----"
 DIV_BUTT = "----- Butt -----"
 DIV_NIPS = "----- Nipples -----"
+DIV_BITS = "----- Vaginal and Anal -----" # Why are people so thirsty
+DIV_OTHER = " ----- Other -----"
+
 
 # All of our shapekeys needed.
 FULLBODY_KEYS = [
@@ -157,11 +160,59 @@ BUTT_KEYS = [
     "ButtUnderFold",
 ]
 
-
 NIPPLE_KEYS = [
-
-
+    "AreolaPull_v2",
+    "AreolaSize",
+    "NippleBump_v2",
+    "NippleCrease_v2",
+    "NippleCrumpled_v2",
+    "NippleManga", # This is 'Defined'? ?????
+    "NippleDip",
+    "NippleDistance",
+    "NipBGone",
+    "NippleInvert_v2",
+    "NippleLength",
+    "NipplePuffy_v2",
+    "NipplePerkManga", # More Puff?????
+    "NipplePerkiness",
+    "NippleDown",
+    "NippleUp",
+    "NippleShy_v2",
+    "NippleSize",
+    "NippleSquash1_v2",
+    "NippleSquash2_v2",
+    "NippleThicc_v2",
+    "NippleTip",
+    "NippleTube_v2",
+    "NippleTipManga", # Somehow, this is twisty nips.
 ]
+
+# *sigh*
+BITS_KEYS = [
+    "AnalPosition_v2",
+    "AnalLoose_v2",
+    "AnalTexPos_v2",
+    "AnalTexPosRe_v2",
+    "ClitSwell_v2",
+    "Clit",
+    "CBPC", # Crotch Puffy
+    "Cutepuffyness",
+    "CrotchGap",
+    "VaginaHole", # Hole Size
+    "Innieoutie",
+    "LabiaBulgogi_v2",
+    "LabiaCrumpled_v2",
+    "Labiaprotrude",
+    "Labiaprotrude2",
+    "Labiaspread",
+    "Labiapuffyness",
+    "LabiaMorePuffyness_v2",
+    "LabiaNeat_v2",
+    "Labiaprotrudeback",
+    "LabiaTightUp",
+    "Vaginasize",
+]
+
 
 CASE_INSENSITIVE = True
 
@@ -237,6 +288,7 @@ ensure_divider(obj, DIV_BELLY)
 ensure_divider(obj, DIV_BREASTS)
 ensure_divider(obj, DIV_BUTT)
 ensure_divider(obj, DIV_NIPS)
+ensure_divider(obj, DIV_BITS)
 
 # Build ordered plan
 fullbody = unique_existing(obj, FULLBODY_KEYS)
@@ -248,6 +300,8 @@ muscles = unique_existing(obj, MUSCLE_KEYS)
 belly = unique_existing(obj, BELLY_KEYS)
 breasts = unique_existing(obj, BREAST_KEYS)
 butt = unique_existing(obj, BUTT_KEYS)
+nipples = unique_existing(obj, NIPPLE_KEYS)
+bits = unique_existing(obj, BITS_KEYS)
 
 # Names to exclude from "everything else"
 divider_set = {
@@ -261,9 +315,10 @@ divider_set = {
     norm(DIV_BREASTS),
     norm(DIV_BUTT),
     norm(DIV_NIPS),
+    norm(DIV_BITS),
 }
 
-listed_set = {norm(n) for n in fullbody + torso + arms + hips + legsfeet + muscles + breasts + butt}
+listed_set = {norm(n) for n in fullbody + torso + arms + hips + legsfeet + muscles + breasts + butt + nipples + bits}
 listed_set |= divider_set
 listed_set.add(norm("Basis"))
 
@@ -317,6 +372,16 @@ for name in breasts:
 # Butt    
 target = move_name_to_index(obj, DIV_BUTT, target)
 for name in butt:
+    target = move_name_to_index(obj, name, target)
+    
+# Nipples    
+target = move_name_to_index(obj, DIV_NIPS, target)
+for name in nipples:
+    target = move_name_to_index(obj, name, target)
+    
+# The female parts.
+target = move_name_to_index(obj, DIV_BITS, target)
+for name in bits:
     target = move_name_to_index(obj, name, target)
 
 print("Done: created dividers and reorganized shape keys.")

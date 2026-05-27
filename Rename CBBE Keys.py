@@ -135,7 +135,57 @@ RENAME_MAP = {
     "Butt": "Butt Size",
     "ButtSmall": "Smaller Butt",
     "ButtUnderFold": "Under Fold",
+    
+    # Nipples
+    "AreolaPull_v2": "Areola Pull",
+    "AreolaSize": "Areola Size",
+    "NippleBump_v2": "Bumpy Nips",
+    "NippleCrease_v2": "Creased Nips",
+    "NippleCrumpled_v2": "Crumpled Nips",
+    "NippleManga": "Defined Nips", # This is 'Defined'? ?????
+    "NippleDip": "Nip Dip",
+    "NippleDistance": "Nip Distance",
+    "NipBGone": "Nips Gone",
+    "NippleInvert_v2": "Invert",
+    "NippleLength": "Nip Length",
+    "NipplePuffy_v2": "Puffy Nips",
+    "NipplePerkManga": "More Nip Puff", # More Puff?????
+    "NipplePerkiness": "Perky Nips",
+    "NippleDown": "Nip Point Down",
+    "NippleUp": "Nip Point Up",
+    "NippleShy_v2": "Shy Nips",
+    "NippleSize": "Nipple Size",
+    "NippleSquash1_v2": "Squish Nips Horizontally",
+    "NippleSquash2_v2": "Squish Nips Vertically",
+    "NippleThicc_v2": "Thicc Nips",
+    "NippleTip": "Nip Tip",
+    "NippleTube_v2": "Tube Shaped Nips",
+    "NippleTipManga": "Twist Nipples", # Somehow, this is twisty nips.
  
+ 
+    # Female Bits
+    "AnalPosition_v2": "Anus Back",
+    "AnalLoose_v2": "Anus Loose",
+    "AnalTexPos_v2": "Anus Texture 1",
+    "AnalTexPosRe_v2": "Anus Texture 2",
+    "ClitSwell_v2": "Clit Swell",
+    "Clit": "Clitoris",
+    "CBPC": "Crotch Puff", # Crotch Puffy
+    "Cutepuffyness": "Cute Puff",
+    "CrotchGap": "Crotch Gap",
+    "VaginaHole": "Hole Size", # Hole Size
+    "Innieoutie": "Innie Outie",
+    "LabiaBulgogi_v2": "Labia Bulgogi",
+    "LabiaCrumpled_v2": "Labia Crumpled",
+    "Labiaprotrude": "Labia Protrude",
+    "Labiaprotrude2": "Labia Protrude 2",
+    "Labiaspread": "Labia Spread",
+    "Labiapuffyness": "Puffy",
+    "LabiaMorePuffyness_v2": "More Puff",
+    "LabiaNeat_v2": "Neat",
+    "Labiaprotrudeback": "Protrude Back",
+    "LabiaTightUp": "Tight Up",
+    "Vaginasize": "Smaller Vagina",
     # add more...
 }
 
