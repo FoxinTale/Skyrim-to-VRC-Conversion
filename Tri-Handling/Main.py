@@ -1,13 +1,13 @@
 from pathlib import Path
 
 from TriParser import read_tri, get_shape_vertex_requirement
-from NifParser import read_nif_shapes, validate_faces, read_vertices_with_position_offset, read_nif_header, probe_vertex_position_offsets
+from NifParser import read_nif_shapes, validate_faces, read_vertices_with_position_offset, read_nif_header
 from ObjWriter import write_obj
 
 def main():
-    nif_path = Path(r"outfit.nif")
-    tri_path = Path(r"lingerie.tri")
-    out_path = r"debug_vertices.obj"
+    nif_path = Path(r"torso_1.nif")
+    tri_path = Path(r"torso.tri")
+#    out_path = r"debug_vertices.obj"
     
 #    out_dir = Path(r"test")
 #    out_dir.mkdir(parents=True, exist_ok=True)
