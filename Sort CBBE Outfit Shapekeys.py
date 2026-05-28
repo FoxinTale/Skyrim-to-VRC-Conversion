@@ -383,5 +383,10 @@ for name in nipples:
 target = move_name_to_index(obj, DIV_BITS, target)
 for name in bits:
     target = move_name_to_index(obj, name, target)
+    
+# Anything else not covered.
+target = move_name_to_index(obj, DIV_OTHER, target)
+for name in everything_else:
+    target = move_name_to_index(obj, name, target)
 
 print("Done: created dividers and reorganized shape keys.")

@@ -1,5 +1,5 @@
 For the models:
-Blender 3.4.1
+Blender 3.4.1 or higher.
 Blender niftools: https://github.com/niftools/blender_niftools_addon/releases/download/v0.1.1/blender_niftools_addon-v0.1.1-2023-11-03-0305c8d5.zip
 Bethesda Archive Extractor: https://www.nexusmods.com/skyrimspecialedition/mods/974
 Animation tools: https://www.nexusmods.com/skyrim/mods/30162
@@ -11,6 +11,7 @@ GIMP
 
 Other, general tools:
 x/SSE Edit.
+Python, greater than 3.8 installed.
 
 
 This does assume you know the basic controls of Blender (controls), and basic computer knowledge. And know basic anatomy. Yes, I'm serious.
@@ -39,3 +40,6 @@ Maybe, once this is good for final release, re-structure the folders.
 - Blender Scripts
 - Tri extractor
 - Guide (further broken down)
+
+
+--------

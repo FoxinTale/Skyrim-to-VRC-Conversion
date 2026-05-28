@@ -5,9 +5,9 @@ from NifParser import read_nif_shapes
 from ObjWriter import write_obj
 
 def main():
-    nif_path = Path(r"torso_1.nif")
-    tri_path = Path(r"torso.tri")
-
+    nif_path = Path(r"NIFs/torso_1.nif")
+    tri_path = Path(r"NIFs/torso.tri")
+    export_name = "RoamingGirl"
 
     nif_shapes = read_nif_shapes(nif_path)
     tri_shapes, has_uv = read_tri(tri_path)
@@ -19,7 +19,7 @@ def main():
 
     tri_by_name = {shape["name"]: shape for shape in tri_shapes}
 
-    out_root = Path(r"morph_exports")
+    out_root = Path(f"{export_name}_morphs")
     out_root.mkdir(parents=True, exist_ok=True)
 
     for nif_shape in nif_shapes:
@@ -46,8 +46,18 @@ def main():
                 nif_shape["vertices"],
                 morph,
             )
+            
+            write_obj(
+                shape_dir / "base.obj",
+                nif_shape["vertices"],
+                nif_shape["faces"],
+                object_name=shape_name,
+                uvs=nif_shape["uvs"],
+            )
 
             out_path = shape_dir / f"{morph['name']}.obj"
+            
+            
 
             write_obj(
                 out_path,

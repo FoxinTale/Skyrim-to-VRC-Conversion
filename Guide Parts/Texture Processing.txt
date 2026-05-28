@@ -1,0 +1,27 @@
+For your base map:
+	Open in Paint.net.
+	Save as a .png.
+	Done.
+
+
+For the normal map.
+This will only work for an _msn type normal map, it looks like rainbow vomit.
+	Open in Paint.net.
+	Save as .png.
+	Open the PNG in GIMP.
+	Go to - > Colors - > Components.
+	Click on Decompose. 
+	Now do the same thing, but recompose our grayscale image.
+	We need to make sure  we flip the green and blue channels by clicking the dropdown by green, and selecting what ends in blue.
+	Do the same thing for blue, and make sure it ends in green. Then hit okay. A totally green background is normal.
+	Save this as a PNG, I usually call it "_mns.png"
+
+
+	Now we open the body nif we want to convert in Blender.
+	We only want one object per normal, so if your body mesh has multiple "submeshes", delete them.
+	Save this as an obj with _LP at the end of its name.
+	Once this is done, open XNormal.Go to tools --> Object/Tangent Space Converter. 
+	Select the LP mesh and the _mns we just exported, put the mesh in Lowpoly, and the input normal as the mns.
+	Click on output normal map, you will need to manually type in the filename. I usually do _n.png.
+	It will ask you if you want to create it if it doesn't exist, click yes. 
+	Make sure the "Convert Object Space to Tangent" is selected and set edge padding to 32.

@@ -1,7 +1,7 @@
 from pathlib import Path
 
 
-def write_obj(path, vertices, faces, object_name="Mesh"):
+def write_obj(path, vertices, faces, object_name="Mesh", uvs=None):
     from pathlib import Path
 
     path = Path(path)
@@ -15,6 +15,10 @@ def write_obj(path, vertices, faces, object_name="Mesh"):
 
         for x, y, z in vertices:
             f.write(f"v {x:.6f} {y:.6f} {z:.6f}\n")
+            
+        if uvs:
+            for u, v in uvs:
+                f.write(f"vt {u:.6f} {v:.6f}\n")
 
         for _ in vertices:
             f.write("vt 0.000000 0.000000\n")
@@ -26,4 +30,8 @@ def write_obj(path, vertices, faces, object_name="Mesh"):
             a += 1
             b += 1
             c += 1
-            f.write(f"f {a}/{a}/{a} {b}/{b}/{b} {c}/{c}/{c}\n")
+            
+            if uvs:
+                f.write(f"f {a}/{a}/{a} {b}/{b}/{b} {c}/{c}/{c}\n")
+            else:
+                f.write(f"f {a} {b} {c}\n")

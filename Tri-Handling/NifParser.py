@@ -60,6 +60,7 @@ def read_triangle(f, label):
 def read_skin_partition_mesh(path, partition_block):
     faces = []
     partition_infos = []
+    uvs = []
     vertices = []          # global NIF/TRI vertex order
     render_vertices = []   # OBJ/export vertex order
     faces = []             # OBJ/export faces
@@ -80,9 +81,6 @@ def read_skin_partition_mesh(path, partition_block):
         vertex_count = data_size // vertex_size
         vertex_buffer_start = f.tell()
 
-#        raw_vertices = []
-#        final_vertices = [None] * vertex_count
-#        raw_vertex_cursor = 0
         
         for i in range(vertex_count):
             base = vertex_buffer_start + i * vertex_size
@@ -93,7 +91,12 @@ def read_skin_partition_mesh(path, partition_block):
             z = struct.unpack("<f", read_exact(f, 4, f"vertex {i} z"))[0]
 
             vertices.append((x, y, z))
-#            raw_vertices.append((x, y, z))
+            
+            f.seek(base + 0x10)
+            u = struct.unpack("<f", read_exact(f, 4, f"vertex {i} u"))[0]
+            v = struct.unpack("<f", read_exact(f, 4, f"vertex {i} v"))[0]
+            uvs.append((u, v))
+            
         f.seek(vertex_buffer_start + data_size)
 
         for p in range(num_partitions):
@@ -177,30 +180,11 @@ def read_skin_partition_mesh(path, partition_block):
             else:
                 for i in range(num_vertices):
                     render_vertices.append(vertices[i])
-#            if p == 0:
-#                print("RENDER CHECK")
-#                for idx in [25, 26, 27, 28, 34, 35]:
-#                    print(
-#                        idx,
-#                        "vertex_map:", vertex_map[idx] if vertex_map else None,
-#                        "render:", render_vertices[render_start + idx],
-#                        "global mapped:",
-#                        vertices[vertex_map[idx]] if vertex_map else vertices[idx],
-#                    )
-            # partition_faces index into this partition-local vertex list.
-#            print("vertex_map around 20-40:", vertex_map[20:40])
-#            print("vertex_map around 60-90:", vertex_map[60:90])
+
             
             for a, b, c in partition_faces:
                 faces.append((a, b, c))
-#                faces.append((
-#                    render_start + a,
-#                    render_start + b,
-#                    render_start + c,
-#                ))
-                
-#            print("vertex_map first 20:", vertex_map[:20])
-#            print("partition_faces first 20:", partition_faces[:20])
+
             partition_infos.append({
                 "partition_index": p,
                 "vertex_count": num_vertices,
@@ -219,62 +203,14 @@ def read_skin_partition_mesh(path, partition_block):
         "vertices": vertices,              # keep this for TRI morphs
         "obj_vertices": render_vertices,   # use this for OBJ export
         "faces": faces,
+        "uvs": uvs,
         "partition_infos": partition_infos,
         "vertex_size": vertex_size,
         "vertex_count": len(vertices),
         "face_count": len(faces),
     }
      
- 
- 
-def read_vertices_with_position_offset(path, partition_block, pos_offset):
-    vertices = []
 
-    with Path(path).open("rb") as f:
-        f.seek(partition_block["offset"])
-
-        num_partitions = read_u32(f, "num partitions")
-        data_size = read_u32(f, "vertex data size")
-        vertex_size = read_u32(f, "vertex size")
-        vertex_desc = read_exact(f, 8, "vertex desc")
-
-        vertex_count = data_size // vertex_size
-        vertex_buffer_start = f.tell()
-
-        for i in range(vertex_count):
-            base = vertex_buffer_start + i * vertex_size
-            f.seek(base + pos_offset)
-
-            x = struct.unpack("<f", read_exact(f, 4, f"vertex {i} x"))[0]
-            y = struct.unpack("<f", read_exact(f, 4, f"vertex {i} y"))[0]
-            z = struct.unpack("<f", read_exact(f, 4, f"vertex {i} z"))[0]
-
-            vertices.append((x, y, z))
-
-    return vertices
-    
-    
-    
-def validate_faces(vertices, faces, shape_name):
-    max_vert = len(vertices) - 1
-    bad = []
-
-    for i, (a, b, c) in enumerate(faces):
-        if a > max_vert or b > max_vert or c > max_vert:
-            bad.append((i, (a, b, c)))
-
-#    print(f"\nFace validation for {shape_name}:")
-#    print(f"  vertices: {len(vertices)}")
-#    print(f"  faces: {len(faces)}")
-#    print(f"  max face index: {max(max(face) for face in faces) if faces else 'none'}")
-#    print(f"  bad faces: {len(bad)}")
-
-#    if bad:
-#        print("  first bad faces:")
-#        for item in bad[:10]:
-#            print(f"    {item}")
-
-            
 def read_nif_shapes(path):
     header = read_nif_header(path)
 
@@ -322,6 +258,7 @@ def read_nif_shapes(path):
             "skin_block_index": skin_block["index"],
             "partition_block_index": partition_block["index"],
             "vertices": mesh["vertices"],
+            "uvs": mesh["uvs"],
             "obj_vertices": mesh["obj_vertices"],
             "faces": mesh["faces"],
             "partition_infos": mesh["partition_infos"],
@@ -431,19 +368,6 @@ def read_nif_header(path):
         }
     
     
-
-def get_block_ref_at(path, block, rel_offset, blocks):
-    ref = read_i32_at(path, block["offset"] + rel_offset)
-
-    if ref < 0:
-        return None
-
-    if ref >= len(blocks):
-        raise ValueError(
-            f"Bad block ref {ref} in block {block['index']} at +0x{rel_offset:X}"
-        )
-
-    return blocks[ref]
     
     
 def get_valid_ref_at(path, block, rel_offset, blocks, expected_type):
@@ -481,48 +405,6 @@ def decode_version(v):
     )
 
 
-def probe_after_vertex_buffer(path, partition_block, byte_count=128):
-    with Path(path).open("rb") as f:
-        f.seek(partition_block["offset"])
-
-        num_partitions = read_u32(f, "num partitions")
-        vertex_data_size = read_u32(f, "vertex data size")
-        vertex_stride = read_u32(f, "vertex stride")
-
-        vertex_buffer_start = f.tell()
-        after_vertex_buffer = vertex_buffer_start + vertex_data_size
-
-        f.seek(after_vertex_buffer)
-        data = f.read(min(byte_count, partition_block["size"] - (after_vertex_buffer - partition_block["offset"])))
-
-#    print(
-#        f"\nAfter vertex buffer for NiSkinPartition block {partition_block['index']}:"
-#    )
-#    print(f"  num partitions: {num_partitions}")
-#    print(f"  vertex data size: {vertex_data_size}")
-#    print(f"  vertex stride: {vertex_stride}")
-#    print(f"  vertex buffer start: 0x{vertex_buffer_start:X}")
-#    print(f"  after vertex buffer: 0x{after_vertex_buffer:X}")
-
-#    print("\n  Word decode:")
-    for i in range(0, len(data) - 3, 4):
-        chunk = data[i:i + 4]
-        u32 = struct.unpack("<I", chunk)[0]
-        i32 = struct.unpack("<i", chunk)[0]
-        f32 = struct.unpack("<f", chunk)[0]
-
-#        print(
-#            f"  +0x{i:02X}: "
-#            f"u32={u32:<10} "
-#            f"i32={i32:<10} "
-#            f"f32={f32:g}"
-#        )
-
-#    print("\n  As u16 pairs/triples:")
-    for i in range(0, min(len(data), 96) - 5, 6):
-        a, b, c = struct.unpack("<HHH", data[i:i + 6])
-#        print(f"  +0x{i:02X}: ({a}, {b}, {c})")
-
 def probe_vertex_record_layout(path, partition_block, record_count=3):
     with Path(path).open("rb") as f:
         f.seek(partition_block["offset"])
@@ -545,6 +427,7 @@ def probe_vertex_record_layout(path, partition_block, record_count=3):
                 value = struct.unpack("<f", read_exact(f, 4, "float probe"))[0]
                 print(f"  +0x{off:02X}: {value}")
 
+
 def read_header_probe(path):
     header = read_nif_header(path)
 
@@ -563,13 +446,6 @@ def read_header_probe(path):
             tri_block,
             header["strings"],
         )
-
-#        print(
-#            f"\nBSTriShape block {tri_block['index']}: {name} "
-#            f"size={tri_block['size']} "
-#            f"offset=0x{tri_block['offset']:X}"
-#        )
-        
 
 
         skin_block, skin_offset = find_ref_by_candidate_offsets(
@@ -600,11 +476,6 @@ def read_header_probe(path):
             "NiSkinPartition",
         )
 
-#        print(
-#            f"  Skin ref +0x{skin_offset:X} "
-#            f"→ SkinInstance {skin_block['index']}"
-#        )
-
         if skin_data_block:
             print(f"  NiSkinData: {skin_data_block['index']}")
 
@@ -612,43 +483,14 @@ def read_header_probe(path):
             print("  No valid NiSkinPartition found")
             continue
 
-#        print(f"  NiSkinPartition: {partition_block['index']}")
-
-
         vertices, partition_infos = read_skin_partition_vertices(
             path,
             partition_block,
         )
 
-#        print(f"  Read vertices: {len(vertices)}")
-
-#        for info in partition_infos:
-#            print(
-#                f"    partition {info['partition_index']}: "
-#                f"{info['vertex_count']} verts, "
-#                f"stride {info['vertex_stride']}, "
-#                f"reported partitions {info.get('reported_num_partitions')}"
-#            )
-
-#        probe_after_vertex_buffer(
-#            path,
-#            partition_block,
-#            byte_count=160,
-#        )
-        
-#        probe_after_vertex_buffer_u16(
-#            path,
-#            partition_block
-#        )
-        
-#        probe_triangle_candidates(
-#            path,
-#            partition_block,
-#            max_offsets=512,
-#            preview_faces=8,
-#       )
 
         probe_post_vertex_words(path, partition_block)
+        
         
 def probe_post_vertex_words(path, partition_block, byte_count=256):
     with Path(path).open("rb") as f:
@@ -669,188 +511,8 @@ def probe_post_vertex_words(path, partition_block, byte_count=256):
     for rel in range(0, len(data) - 4, 4):
         u32 = struct.unpack("<I", data[rel:rel + 4])[0]
         lo, hi = struct.unpack("<HH", data[rel:rel + 4])
-
-#        print(
-#            f"+0x{rel:04X}: "
-#            f"u32={u32:<10} "
-#            f"u16=({lo}, {hi})"
-#        )      
-
-def probe_triangle_candidates(path, partition_block, max_offsets=256, preview_faces=8):
-    with Path(path).open("rb") as f:
-        f.seek(partition_block["offset"])
-
-        num_partitions = read_u32(f, "num partitions")
-        vertex_data_size = read_u32(f, "vertex data size")
-        vertex_stride = read_u32(f, "vertex stride")
-
-        vertex_count = vertex_data_size // vertex_stride
-        vertex_buffer_start = f.tell()
-        after_vertex_buffer = vertex_buffer_start + vertex_data_size
-
-#        print("\nTriangle candidate scan:")
-#        print(f"  vertex count: {vertex_count}")
-#        print(f"  scan start: 0x{after_vertex_buffer:X}")
-
-        for rel in range(0, max_offsets, 2):
-            f.seek(after_vertex_buffer + rel)
-
-            try:
-                triples = []
-                valid = 0
-
-                for _ in range(preview_faces):
-                    a = read_u16(f, "tri a")
-                    b = read_u16(f, "tri b")
-                    c = read_u16(f, "tri c")
-
-                    triples.append((a, b, c))
-
-                    if a < vertex_count and b < vertex_count and c < vertex_count:
-                        valid += 1
-
-                if valid == preview_faces:
-                    print(f"\nPossible triangle list at +0x{rel:X}:")
-                    for tri in triples:
-                        print(f"  {tri}")
-
-            except EOFError:
-                break
+     
             
-            
-            
-#def peek_block(path, block, byte_count=120):
-#    path = Path(path)
-
-#    with path.open("rb") as f:
-#        f.seek(block["offset"])
-#        data = f.read(min(byte_count, block["size"]))
-
-#    print(
-#        f"\nBlock {block['index']} "
-#        f"({block['type_name']}), "
-#        f"size={block['size']}, "
-#        f"offset=0x{block['offset']:X}"
-#    )
-#    print(data.hex(" "))
-#    print(data.decode("ascii", errors="replace"))
-    
-    
-def decode_block_words(path, block):
-    path = Path(path)
-
-    with path.open("rb") as f:
-        f.seek(block["offset"])
-        data = f.read(min(32, block["size"]))
-
-#    print(
-#        f"\nBlock {block['index']} "
-#        f"({block['type_name']}) word decode:"
-#    )
-
-    for i in range(0, len(data), 4):
-        chunk = data[i:i+4]
-        if len(chunk) < 4:
-            break
-
-        u = struct.unpack("<I", chunk)[0]
-        s = struct.unpack("<i", chunk)[0]
-        fl = struct.unpack("<f", chunk)[0]
-
-#       print(
-#           f"+0x{i:02X}: "
-#           f"u32={u:<12} "
-#           f"i32={s:<12} "
-#           f"f32={fl}"
-#       )
-
-        
-def scan_block_refs(path, block, max_block_index):
-    path = Path(path)
-    refs = []
-
-    with path.open("rb") as f:
-        f.seek(block["offset"])
-        data = f.read(block["size"])
-
-    for offset in range(0, len(data) - 3):
-        value = struct.unpack("<i", data[offset:offset + 4])[0]
-
-        if 0 <= value <= max_block_index:
-            refs.append((offset, value))
-
-    return refs
-
-
-def find_first_ref_of_type(path, source_block, blocks, target_type):
-    refs = scan_block_refs(path, source_block, len(blocks) - 1)
-
-    for ref_offset, ref in refs:
-        if blocks[ref]["type_name"] == target_type:
-            return {
-                "offset": ref_offset,
-                "block": blocks[ref],
-            }
-
-    return None   
- 
-def peek_words(path, block, byte_count=96):
-    with Path(path).open("rb") as f:
-        f.seek(block["offset"])
-        data = f.read(min(byte_count, block["size"]))
-
-#    print(
-#        f"\nBlock {block['index']} ({block['type_name']}), "
-#        f"size={block['size']}, offset=0x{block['offset']:X}"
-#    )
-
-    for i in range(0, len(data) - 3, 4):
-        chunk = data[i:i+4]
-        u32 = struct.unpack("<I", chunk)[0]
-        i32 = struct.unpack("<i", chunk)[0]
-        f32 = struct.unpack("<f", chunk)[0]
-
-#        print(
-#            f"+0x{i:02X}: "
-#            f"u32={u32:<10} "
-#            f"i32={i32:<10} "
-#            f"f32={f32:g}"
-#        )
-        
-        
-def probe_skin_partition_vertices(path, partition_block, count=5):
-    with Path(path).open("rb") as f:
-        f.seek(partition_block["offset"])
-
-        num_partitions = read_u32(f, "num partitions")
-        vertex_data_size = read_u32(f, "vertex data size")
-        vertex_stride = read_u32(f, "vertex stride")
-
-        print("num partitions:", num_partitions)
-        print("vertex data size:", vertex_data_size)
-        print("vertex stride:", vertex_stride)
-
-        if vertex_stride == 0:
-            raise ValueError("Vertex stride is zero")
-
-        vertex_count = vertex_data_size // vertex_stride
-        print("derived vertex count:", vertex_count)
-
-        vertex_buffer_start = f.tell()
-
-        for i in range(min(count, vertex_count)):
-            base = vertex_buffer_start + i * vertex_stride
-
-            # Try position at +8 inside each vertex record.
-            f.seek(base + 8)
-            x = struct.unpack("<f", f.read(4))[0]
-            y = struct.unpack("<f", f.read(4))[0]
-            z = struct.unpack("<f", f.read(4))[0]
-
-#            print(f"vertex {i}: {x:.6f}, {y:.6f}, {z:.6f}")
-            
-VALID_VERTEX_STRIDES = {32, 40}
-
 def read_skin_partition_vertices(path, partition_block):
     all_vertices = []
     partition_infos = []
@@ -902,58 +564,7 @@ def read_skin_partition_vertices(path, partition_block):
 
     return all_vertices, partition_infos
 
-def get_shape_vertex_requirement(shape):
-    max_id = -1
 
-    for morph in shape["morphs"]:
-        for vertex_id, dx, dy, dz in morph["vertices"]:
-            max_id = max(max_id, vertex_id)
-
-    return max_id + 1 if max_id >= 0 else 0
-    
-    
-    
-def probe_after_vertex_buffer_u16(path, partition_block, count=80):
-    with Path(path).open("rb") as f:
-        f.seek(partition_block["offset"])
-
-        num_partitions = read_u32(f, "num partitions")
-        vertex_data_size = read_u32(f, "vertex data size")
-        vertex_stride = read_u32(f, "vertex stride")
-
-        vertex_buffer_start = f.tell()
-        after_vertex_buffer = vertex_buffer_start + vertex_data_size
-
-        f.seek(after_vertex_buffer)
-
-        values = []
-        for i in range(count):
-            values.append(read_u16(f, f"post-vertex u16 {i}"))
-
-    print("\nPost-vertex u16 stream:")
-    for i in range(0, len(values), 16):
-        chunk = values[i:i + 16]
-        print(f"{i:04d}: " + " ".join(f"{v:5d}" for v in chunk))
-
-        
-def probe_shape_name_indices(path, tri_shapes, strings):
-    print("\n=== BSTriShape possible name indices ===")
-
-    for block in tri_shapes:
-        with Path(path).open("rb") as f:
-            f.seek(block["offset"])
-            data = f.read(block["size"])
-
-        print(f"\nBSTriShape block {block['index']}:")
-
-        for offset in range(0, len(data) - 3, 4):
-            value = struct.unpack("<i", data[offset:offset + 4])[0]
-
-            if 0 <= value < len(strings):
-                s = strings[value]
-                print(f"  +0x{offset:02X}: string[{value}] = {s}")
-                
-                
 def get_bstrishape_name(path, block, strings):
     name_index = read_i32_at(path, block["offset"] + 0x00)
 
@@ -964,62 +575,6 @@ def get_bstrishape_name(path, block, strings):
 
     return strings[name_index]
 
-def report_nif_tri_shape_matches(nif_shapes, trip_shapes):
-    trip_by_name = {
-        shape["name"]: shape
-        for shape in trip_shapes
-    }
-
-    print("\n=== NIF/TRI Shape Match Report ===")
-
-    for nif_shape in nif_shapes:
-        name = nif_shape["name"]
-        nif_vert_count = len(nif_shape["vertices"])
-
-        print(f"\nNIF shape: {name}")
-        print(f"  NIF vertices: {nif_vert_count}")
-
-        trip_shape = trip_by_name.get(name)
-
-        if not trip_shape:
-            print("  TRI match: MISSING")
-            continue
-
-        required = get_shape_vertex_requirement(trip_shape)
-
-        print(f"  TRI required vertices: {required}")
-
-        if required == nif_vert_count:
-            print("  MATCH")
-        else:
-            print("  MISMATCH")
-
-
-def probe_vertex_position_offsets(path, partition_block, vertex_index=0):
-    with Path(path).open("rb") as f:
-        f.seek(partition_block["offset"])
-
-        num_partitions = read_u32(f, "num partitions")
-        data_size = read_u32(f, "vertex data size")
-        vertex_size = read_u32(f, "vertex size")
-        vertex_desc = read_exact(f, 8, "vertex desc")
-
-        vertex_buffer_start = f.tell()
-        base = vertex_buffer_start + vertex_index * vertex_size
-
-        print(f"\nVertex record probe:")
-        print(f"  vertex_size: {vertex_size}")
-        print(f"  vertex_buffer_start: 0x{vertex_buffer_start:X}")
-        print(f"  vertex {vertex_index} base: 0x{base:X}")
-
-        for off in range(0, vertex_size - 11, 4):
-            f.seek(base + off)
-
-            x = struct.unpack("<f", read_exact(f, 4, f"offset {off} x"))[0]
-            y = struct.unpack("<f", read_exact(f, 4, f"offset {off} y"))[0]
-            z = struct.unpack("<f", read_exact(f, 4, f"offset {off} z"))[0]
-
-            print(f"  +0x{off:02X}: {x:.6f}, {y:.6f}, {z:.6f}")
             
 if __name__ == "__main__":
     nif_path = r"outfit.nif"
