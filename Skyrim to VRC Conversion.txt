@@ -34,7 +34,8 @@ The head:
 	Setting up the tris
 	Cover the case where it freaks out on the vertexes.
 
-
+Outfits:
+	
 
 -----------
 Maybe, once this is good for final release, re-structure the folders.

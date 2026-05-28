@@ -51,6 +51,9 @@ RENAME_MAP = {
     "R Breast02": "Right Breast.002",
     "R Breast03": "Right Breast.003",
     
+    "NPC R Breast": "Breast.R",
+    "NPC L Breast": "Breast.L",
+    
     "NPC Clavicle [Clv].L": "Left Shoulder",
     "NPC UpperArm [Uar].L": "Left Upper Arm",
     "NPC Forearm [Lar].L": "Left Lower Arm",
@@ -80,6 +83,9 @@ RENAME_MAP = {
     "NPC LT Anus2": "Left Upper Anus",
     "NPC LB Anus2": "Left Lower Anus",
     "NPC Anus Deep2": "Deep Anus",
+    
+    "NPC GenitalsBase [GenBase]": "Genitals Root",
+    "NPC Genitals01 [Gen01]": "Genitals.001",
     
     "NPC Finger00 [F00].R": "Right Thumb.001",
     "NPC Finger01 [F01].R": "Right Thumb.002",
