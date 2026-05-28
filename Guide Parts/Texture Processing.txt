@@ -5,7 +5,7 @@ For your base map:
 
 
 For the normal map.
-This will only work for an _msn type normal map, it looks like rainbow vomit.
+This will only work for an _msn type normal map, it looks like rainbow vomit. Otherwise see the end.
 	Open in Paint.net.
 	Save as .png.
 	Open the PNG in GIMP.
@@ -17,11 +17,59 @@ This will only work for an _msn type normal map, it looks like rainbow vomit.
 	Save this as a PNG, I usually call it "_mns.png"
 
 
-	Now we open the body nif we want to convert in Blender.
+	Now we open then if we want to convert in Blender.
+
+	Note: If you are doing the body, there is a separate step.
+	Otherwise the following works for hands, feet and tails. 
+
 	We only want one object per normal, so if your body mesh has multiple "submeshes", delete them.
-	Save this as an obj with _LP at the end of its name.
-	Once this is done, open XNormal.Go to tools --> Object/Tangent Space Converter. 
-	Select the LP mesh and the _mns we just exported, put the mesh in Lowpoly, and the input normal as the mns.
-	Click on output normal map, you will need to manually type in the filename. I usually do _n.png.
-	It will ask you if you want to create it if it doesn't exist, click yes. 
-	Make sure the "Convert Object Space to Tangent" is selected and set edge padding to 32.
+
+	BUT if you are using a body mesh, you need to do this:
+		Import both the body and feet nif.
+		Delete the material from both.
+		Create a new one and name it "Body".
+		Then set the materials to this new one.
+		Join the body and feet.
+		Rotate the model by 90 degrees on the X.
+
+	Otherwise, if a head, hands, custom feet (they use a different texture  than the body), or tail:
+		Import the Nif
+		Rotate by 90 degrees on the X axis.	
+		
+	
+	Reconvening after either step:
+		Save whatever you did in the previous step(s) as an obj with _LP at the end of its name.
+		Once this is done, open XNormal. Go to tools --> Object/Tangent Space Converter. 
+		Select the LP mesh and the _mns we just exported, put the mesh in Lowpoly, and the input normal as the mns.
+		Click on output normal map, you will need to manually type in the filename. I usually do _n.png.
+		It will ask you if you want to create it if it doesn't exist, click yes. 
+		Make sure the "Convert Object Space to Tangent" is selected and set edge padding to 32.
+		Click the big ol' Generate button and wait.
+		If your texture is purply goodness then you're almost done. Otherwise go back over the steps to see where it went wrong.
+		Open the exported TGA in either Gimp or Paint.net and save as a .PNG.
+		Done.
+
+We do not need to worry about a _sk texture, and the _s is treated just like the base map at the very start.
+
+
+As for Normal maps that you can't really tell if there is anything there, or ending in _n. Skyrim is...strange. It uses model spaced normals only on the bodies, and tangent everywhere else.
+But these tangent normals are at about 5-10% opacity otherwise things look too shiny. 
+Because of this opacity, we can't just slap this into Unity and call it a day.
+
+
+	Open the _n in paint.net and save as a png. You should also have the base coulour from the beginning of this process.
+	Open Shadermap Pro, you do not have to buy it, just clock off the purchase window and drag/drop the colour. 
+	It may need a bit to think, but when it does you'll see some stuff. 
+	I like to re-arrange the tiles and remove what I don't need first off.
+`	Drag/Drop your _n onto one of the unoccupied squares.
+	Click the plus sign in another unoccupied square. We want "Blend Normals (Map A, Map B)".
+	Click the right arrow by Alpha til you see Remove. 
+	From here, play with the Blend Intensity as you see fit. 
+	Make sure to save your project here. 
+	Once you have it to something that looks good, there's a little save icon by the blended normal map. Click it.
+	A new box will pop up. Save as (filename).tif, then click the right arrow til you see "TIF 16 RGBA" Save it now.
+	Open this tif in paint.net and save as a .png either in a new folder, or a different name so we're not over-writing the original _n.
+	Done.
+
+Yep. That's pretty much as much as you need to know about texture processing when porting from Skyrim to Unity.
+I'm still trying to figure out how to deal with facegen exports, so that will come in a later update.

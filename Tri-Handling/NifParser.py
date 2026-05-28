@@ -92,10 +92,13 @@ def read_skin_partition_mesh(path, partition_block):
 
             vertices.append((x, y, z))
             
+            uv_raw = None
             f.seek(base + 0x10)
-            u = struct.unpack("<f", read_exact(f, 4, f"vertex {i} u"))[0]
-            v = struct.unpack("<f", read_exact(f, 4, f"vertex {i} v"))[0]
-            uvs.append((u, v))
+            uv_raw = read_exact(f, 4, f"vertex {i} uv")
+
+            u = struct.unpack("<e", uv_raw[0:2])[0]
+            v = struct.unpack("<e", uv_raw[2:4])[0]
+            uvs.append((u, 1.0 - v))
             
         f.seek(vertex_buffer_start + data_size)
 
@@ -574,8 +577,7 @@ def get_bstrishape_name(path, block, strings):
         )
 
     return strings[name_index]
-
-            
+   
 if __name__ == "__main__":
     nif_path = r"outfit.nif"
     read_header_probe(nif_path)

@@ -11,6 +11,7 @@ def main():
 
     nif_shapes = read_nif_shapes(nif_path)
     tri_shapes, has_uv = read_tri(tri_path)
+    
  
     tri_by_name = {
         shape["name"]: shape
@@ -33,32 +34,24 @@ def main():
         shape_dir = out_root / shape_name
         shape_dir.mkdir(parents=True, exist_ok=True)
 
-        # Base shape, no prefix.
+
         write_obj(
             shape_dir / "base.obj",
             nif_shape["vertices"],
             nif_shape["faces"],
             object_name=shape_name,
+            uvs=nif_shape["uvs"],
         )
-
+        
         for morph in tri_shape["morphs"]:
             morphed_vertices = apply_morph(
                 nif_shape["vertices"],
                 morph,
             )
             
-            write_obj(
-                shape_dir / "base.obj",
-                nif_shape["vertices"],
-                nif_shape["faces"],
-                object_name=shape_name,
-                uvs=nif_shape["uvs"],
-            )
-
             out_path = shape_dir / f"{morph['name']}.obj"
             
-            
-
+          
             write_obj(
                 out_path,
                 morphed_vertices,

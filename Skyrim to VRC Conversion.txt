@@ -1,17 +1,18 @@
 For the models:
-Blender 3.4.1 or higher.
-Blender niftools: https://github.com/niftools/blender_niftools_addon/releases/download/v0.1.1/blender_niftools_addon-v0.1.1-2023-11-03-0305c8d5.zip
-Bethesda Archive Extractor: https://www.nexusmods.com/skyrimspecialedition/mods/974
-Animation tools: https://www.nexusmods.com/skyrim/mods/30162
+	Blender 3.4.1 or higher.
+	Blender niftools: https://github.com/niftools/blender_niftools_addon/releases/download/v0.1.1/blender_niftools_addon-v0.1.1-2023-11-03-0305c8d5.zip
+	Bethesda Archive Extractor: https://www.nexusmods.com/skyrimspecialedition/mods/974
+	Animation tools: https://www.nexusmods.com/skyrim/mods/30162
 
 For the textures:
-Paint.net.
-XNormal
-GIMP
+	Paint.net: https://getpaint.net/download.html#download
+	XNormal: https://shadermap.com/home/
+	GIMP: https://www.gimp.org/downloads/
+	Shadermap Pro (The free option are just fine for us): https://shadermap.com/home/
 
 Other, general tools:
-x/SSE Edit.
-Python, greater than 3.8 installed.
+	x/SSE Edit.
+	Python, greater than 3.8 installed.
 
 
 This does assume you know the basic controls of Blender (controls), and basic computer knowledge. And know basic anatomy. Yes, I'm serious.
@@ -26,7 +27,7 @@ Fixing the skeleton
 	Linking all the bones together, moving as needed and running the rename script.
 
 Converting the textures
-	Using XNormal
+	Completed. See the Guide Parts folder.
 
 The head:
 	extracting the tris
@@ -43,3 +44,5 @@ Maybe, once this is good for final release, re-structure the folders.
 
 
 --------
+To do in a later update:
+	- Facegen exported textures.
