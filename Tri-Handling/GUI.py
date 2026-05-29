@@ -1,5 +1,9 @@
 import tkinter as tk
 from tkinter import filedialog
+from tkinter import ttk
+from Extractor import extract_tri
+import sys
+from TextRedirector import TextRedirector
 
 
 class MainWindow(tk.Tk):
@@ -81,9 +85,29 @@ class MainWindow(tk.Tk):
             pady=20,
             fill="x"
         )
-#        self.log_box = tk.Text(self, height=10)
-#        self.log_box.pack(fill="both", expand=True, padx=10, pady=10)
+
+
+        self.status_label = tk.Label(
+            self,
+            text="Ready",
+            bg="#3c3f41",
+            fg="white"
+        )
+        self.status_label.pack(padx=10, pady=(10, 0), fill="x")
+
+        self.progress_bar = ttk.Progressbar(
+            self,
+            orient="horizontal",
+            mode="determinate"
+        )
+
+        self.progress_bar.pack(padx=10, pady=10, fill="x")
+        self.log_box = tk.Text(self, height=10)
+        self.log_box.pack(fill="both", expand=True, padx=10, pady=10)
         
+        
+        sys.stdout = TextRedirector(self.log_box)
+        sys.stderr = TextRedirector(self.log_box)
     # ---------------------------------
     # FILE BROWSERS
     # ---------------------------------
@@ -119,16 +143,28 @@ class MainWindow(tk.Tk):
             self.output_entry.insert(0, path)
             
     def extract(self):
-
-        print("Extract button pressed.")
-
         tri_path = self.tri_entry.get()
         nif_path = self.nif_entry.get()
         output_path = self.output_entry.get()
+        self.progress_bar["value"] = 0
+        self.status_label.config(text="Starting...")
 
+        
         print("TRI:", tri_path)
         print("NIF:", nif_path)
         print("OUTPUT:", output_path)
+        extract_tri(nif_path, tri_path, output_path, progress_callback=self.update_progress)
+        self.status_label.config(text="Done.")
+
+    def update_progress(self, completed, total, shape_name, morph_name):
+        self.progress_bar["maximum"] = total
+        self.progress_bar["value"] = completed
+
+        self.status_label.config(
+            text=f"Exporting {shape_name} / {morph_name} ({completed}/{total})"
+        )
+
+        self.progress_bar.update_idletasks()
 
 def log(self, message):
     self.log_box.insert(tk.END, message + "\n")

@@ -94,17 +94,29 @@ def read_tri(path):
         remaining = f.read()
         if len(remaining) >= 2:
             has_uv_section = True
-
+           
     return shapes, has_uv_section
 
+def collect_morphs(shapes):
+    all_morphs = []
+
+    for shape in shapes:
+        for morph in shape["morphs"]:
+            all_morphs.append({
+                "shape_name": shape["name"],
+                "morph_name": morph["name"],
+                "morph": morph,
+            })
+
+    return all_morphs
 # ----------------------------
 # Main test section
 # ----------------------------
 
 if __name__ == "__main__":
-    tri_path = r"lingerie.tri"
-    base_obj_path = r"Base.obj"
-    morph_name = "Waist"
-
-    out_obj_path = rf"{morph_name}.obj"
+    tri_path = r"NIFs\torso.tri"
     shapes, has_uv_section = read_tri(tri_path)
+
+    all_morphs = collect_morphs(shapes)
+
+    print("Total morphs:", len(all_morphs))
