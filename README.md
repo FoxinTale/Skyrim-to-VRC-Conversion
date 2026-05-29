@@ -1,13 +1,25 @@
 # Skyrim to VRC Conversion
-Compendium of scripts and guide to convert a character in Skyrim SE over to VR Chat, or a usable FBX.
+Compendium of scripts, programs, and guides to convert a character in Skyrim SE over to VR Chat, or a usable FBX for usage wherever..
 
-AI Disclaimer: The Python scripts are vibe coded from ChatGPT. Python is beyond me, and I really didn't want to learn a whole scripting API just for this project.
-Though, in hindsight? I probably should have. The program to convert tris over is also from GPT. 
-It was a great help in figuring out and converting the C++ code from bodyslide over to Python.
+### AI Usage Disclaimer: 
+The Python scripts are coded from ChatGPT. Python is beyond me, and I really didn't want to learn a whole scripting API just for this project.
+Though, in hindsight? I probably should have. The program to convert tris over is also from GPT. Without it, this would have probably taken well over six mopnths, 
+assuming I didn't lose my motivation partway through and scrap the whole project.
 
-General Disclaimer: I am not resxponsible for what you do or convert with this tool. Please respect the original creator and check permissions.
+However, the guide and entire process was written by, and figured out by me. Credit to a good friend who helped on the phenome to viseme mapping.
 
-There is an additional program within to handle tri files. You can use tri extractor for facegen stuff, but the tris exported from bodyslide are formatted differently and it doesn't know how to handle that.
-So you (will eventually be able to) input a base nif, and a tri exported, press a button, magic happens and many OBJs are farted out.
+## General Disclaimer: 
+I am not responsible for what you do or convert with this tool. Please respect the original creator and check permissions.
 
-The actual guide and process though is original, figured out by me. The phenome renaming was figured out by a friend of mine who helped on the mappings.
+### The guide
+This is written in a very much haphazard way currently as I'm compiling the entire process into one coherent mess. 
+It'll get cleaned up over time.
+
+## Basic assumptions:
+	- You at least know Blender controls.
+	- You know your way around a computer (how to use a mouse and keyboard)
+	- You understand basic anatomy. Yes, I'm serious.
+	
+# Reequirements:
+- This entire repo. Download the entire thing.
+- At least one brain cell activated.

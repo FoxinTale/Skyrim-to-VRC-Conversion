@@ -1,0 +1,7 @@
+Fist step - See the guide part on converting textures.
+
+Second, we need a bodyslide preset for the outfit. Otherwise we'll have to make one. That will be a different section of the guide.
+
+Assuming we already have a bodyslide preset, open bodyslide itself, load the preset, make sure "build morphs" is checked. 
+While holding left control, click the build button.
+If your outfit has multiple parts (pants, shirt, bracelet and such), you will need to do this for each part.

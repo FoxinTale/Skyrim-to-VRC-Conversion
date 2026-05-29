@@ -10,6 +10,7 @@ CHILD_PICK_MODE = "CLOSEST_TO_TAIL"  # "ONLY_CHILD" or "CLOSEST_TO_TAIL"
 START_CHILD_NAME = "CME TailBone01"  # set to None to use auto-pick
 CASE_INSENSITIVE_CHILD = True
 
+# Change these to yours.
 VERTEX_GROUPS = [
     "HDT TailBone001",
     "HDT TailBone002",
