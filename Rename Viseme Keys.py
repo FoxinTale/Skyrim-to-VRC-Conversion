@@ -2,6 +2,8 @@ import bpy
 
 # ----------------------------
 # CONFIG
+# Simply just renames our phenome keys to VRC's visemes.
+# Credit to a good friend for figuring out how they map. This is standard across all races, beast, human, whathaveyou.
 # ----------------------------
 MAP = {
     "Aah":   "vrc.v_aa",

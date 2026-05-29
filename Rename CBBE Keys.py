@@ -2,6 +2,7 @@ import bpy
 
 # ----------------------------
 # CONFIG
+# Renames CBBE/3BA keys to something more sensible and workable.
 # ----------------------------
 CASE_INSENSITIVE = True
 ONLY_ACTIVE_OBJECT = True   # False = rename on all selected meshes

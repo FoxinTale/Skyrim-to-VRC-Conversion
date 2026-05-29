@@ -3,6 +3,9 @@ from mathutils import Vector
 import math
 # ----------------------------
 # CONFIG
+# A script that adjust HDT bones to a mesh based curve. 
+# Since the way the NIF Importer handles these boens is they are close to the mesh, but rotated a bit. 
+# This script does its best to adjust it.
 # ----------------------------
 MESH_NAME = "fox_tail_0"                 # mesh object that contains the vertex groups
 ROOT_BONE = "CME Tail Spine [Spn0]"        # first bone in the chain (script follows children)

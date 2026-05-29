@@ -2,6 +2,7 @@ import bpy
 
 # ----------------------------
 # CONFIG
+# Renames Skyrim's bones into a naming scheme that Unity (and creators) can work with more easily.
 # ----------------------------
 MODE = "BONES"     # "BONES" or "VERTEX_GROUPS"
 ONLY_SELECTED = True
@@ -82,7 +83,8 @@ RENAME_MAP = {
     "NPC RB Anus2": "Right Lower Anus",
     "NPC LT Anus2": "Left Upper Anus",
     "NPC LB Anus2": "Left Lower Anus",
-    "NPC Anus Deep2": "Deep Anus",
+    "NPC Anus Deep1": "Deep Anus 1",
+    "NPC Anus Deep2": "Deep Anus 2",
     
     "NPC GenitalsBase [GenBase]": "Genitals Root",
     "NPC Genitals01 [Gen01]": "Genitals.001",

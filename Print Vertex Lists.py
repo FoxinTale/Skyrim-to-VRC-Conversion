@@ -2,6 +2,7 @@ import bpy
 
 # ----------------------------
 # CONFIG
+# Prints a list of vertex groups to make copy/pasting into the adjustment script easier.
 # ----------------------------
 START_BONE = "Tail01"          # bone name to start from
 MAX_BONES = 50                # safety cap

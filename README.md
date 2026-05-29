@@ -20,6 +20,11 @@ It'll get cleaned up over time.
 	- You know your way around a computer (how to use a mouse and keyboard)
 	- You understand basic anatomy. Yes, I'm serious.
 	
-# Reequirements:
+# Requirements:
 - This entire repo. Download the entire thing.
 - At least one brain cell activated.
+
+
+# What's in this thing?
+- The Tri Extractor EXE is a program to export morphed OBJs (what you use in race menu on outfits) in a way we can get them into Blender rather easily.
+- A bunch of Blendfer scripts that are generlaly named after what they do, with some comments within each script.

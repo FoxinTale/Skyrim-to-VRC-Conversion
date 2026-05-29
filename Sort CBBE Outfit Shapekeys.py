@@ -2,6 +2,8 @@ import bpy
 
 # ----------------------------
 # CONFIG: edit these lists
+# Sorts the CBBE shapekeys in an outfit. Handles both CBBE and 3BA outfits, 
+# Sorts them similar to how they are displayed in bodyslide.
 # ----------------------------
 DIV_FULLBODY = "----- Full Body -----"
 DIV_TORSO = "----- Torso -----"

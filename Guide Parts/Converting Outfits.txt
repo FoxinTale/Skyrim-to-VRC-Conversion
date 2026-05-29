@@ -1,7 +1,79 @@
-Fist step - See the guide part on converting textures.
+First step, the textures- See the guide part on converting textures.
 
 Second, we need a bodyslide preset for the outfit. Otherwise we'll have to make one. That will be a different section of the guide.
 
 Assuming we already have a bodyslide preset, open bodyslide itself, load the preset, make sure "build morphs" is checked. 
 While holding left control, click the build button.
 If your outfit has multiple parts (pants, shirt, bracelet and such), you will need to do this for each part.
+
+Extracting the morphs:
+	Open the corresponding folder in your mod manager. Since I use Mod Organiser 2 it dropped the files in the overwrite folder. 
+	Navigate to - CalienteTools , then BodySlide. Copy the nifs and tris output by bodyslide to a new folder.
+	Double click on the TriExtractor exe to run it.
+
+	Navigate to the folder you copied the tri and nifs to. Click on the tri to select it, and for the nif selection we want the file ending in _1.
+
+	Now select an output folder. In the window that pops up you can create a new folder with "ctrl + shift + n" on Windows. Give the folder a name.
+	I like to call it "morphs", but you can call it anything that makes sense to you. 
+
+	Click into the newly created folder and now click select folder in the bottom right.
+	Then click the Extract button.
+	If you have multiple meshes, you'll need to do this for each one.
+
+
+Adding the morphs to the outfit:
+	Open Blender and import the _1 nif.
+	We'll have to take it one part at a time, but this is more tedious than difficult. 
+	If you have an HDT mesh, you can delete all of them (HDT colliders)
+	
+	Delete all but one part of the mesh, and go to the exported morph folder.
+	Make sure the mesh you have remaining in Blender is the same name as one of the folders.
+
+	Now import into blender pretty much all of the OBJs from the corresponding mesh folder, except the file named "base".
+	Open the script named "Resize and Apply Objects" in Blender. Change the Y_OFFSET and the Z_OFFSET to 0.0. 
+	Go to the scene on the right, and find your mesh name. It'll probably be under "Scene Root" if you haven't done anything funny.
+	
+	Double click the mesh name and copy the text there. Paste that text into the "" by BASE_OBJ_NAME.
+	Run the script by clicking the play button on top.
+
+	If this fails, there is a procedure to do. This will come in a later update.
+
+Save your Blender project.
+
+A bunch of script running now:
+	Open another script named "Sort CBBE Outfit Shapekeys" if you're porting a CBBE / 3BBB outfit, support for male outfits will be coming later. Run it.
+	This script just sorts our shapekeys into something nice and readable instead of being a garbled mess. 
+	Then load "Rename CBBE Keys" and run it. Does what it says on the tin
+	Final script to load  is "Rename Skyrim Bones". Click the armature in the main window on the left before running it. After selecting the armature run the script.
+
+
+Cleaning up:
+	Delete the imported OBJs by holding left shift and selecting them all, then hitting the delete key. 
+	Drag the scene root into the collection, then the mesh we've done.
+	Rename both Scene Root objects to Armature.
+	Click on the mesh, then the modifier and ensure both say "Armature",  if not drag it over.
+
+
+Dealing with the materials:
+	Select your mesh.
+	Go to the materials window and select the minus sign to remove it.
+	Then add a new one, double click and give it a name, ideally similar to the mesh.
+	(Optional: If it shouldn't be shiny) Scroll down til you see Specular and set it to 0.0
+
+Save your Blender project, and export as FBX with export settings FBX all, no Leaf Bones, and no animation.
+
+
+IF your mesh has multiple parts:
+	You'll need to repeat the above steps until you're totally done.
+	Import each FBX into a new project. 
+	Delete the armature from all but one.
+	Parent each object to the main armature.
+	Make sure each object's modifier is set to the main Armature.
+	Set the materials accordingly.
+	You may be able to join the meshes if they share the same material.
+	Check the UVMap under materials before you do so, and make sure each part has the same map name. 
+	
+
+	
+			
+	

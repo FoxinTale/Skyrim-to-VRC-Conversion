@@ -3,12 +3,16 @@ from mathutils import Euler
 
 # ----------------------------
 # USER VARIABLES
+# This script resizes, rotates and applies meshes to a base.
+# Skyrim TRI files export at 10x scale and rotated by 90 degrees. 
+# For outfits this is good enough, but when you have 50+ items to do this for, scripting becomes the way.
+# Faceparts required an extra step to move around...because *reasons*.
 # ----------------------------
 BASE_OBJ_NAME = "FemaleHead"     # destination mesh (receives shape keys)
 COLLECTION_NAME = None          # set to "MyCollection" or None for whole scene
 UNIFORM_SCALE = 0.1            # uniform scale for each source mesh
-Y_OFFSET = -0.154752
-Z_OFFSET = 12.0344 # amount to move on Z
+Y_OFFSET = -0.154752 # Leave this alone if you're dealing with faceparts, set it to 0.0 for outfits.
+Z_OFFSET = 12.0344 # Leave this alone if you're dealing with faceparts, set it to 0.0 for outfits. 
 SET_Z_ABSOLUTE = False          # False: add offset, True: set location.z = Z_OFFSET
 SET_Y_ABSOLUTE = False
 SKIP_HIDDEN = True

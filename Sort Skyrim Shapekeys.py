@@ -2,6 +2,7 @@ import bpy
 
 # ----------------------------
 # CONFIG: edit these lists
+# This script makes the process of sorting the head related keys much easier.
 # ----------------------------
 DIV_VIS = "----- Visemes -----"
 DIV_EYE = "----- Eyes -----"

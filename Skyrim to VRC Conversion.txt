@@ -37,15 +37,11 @@ The head:
 	Cover the case where it freaks out on the vertexes.
 
 Outfits:
-	Same steps as =
-
------------
-Maybe, once this is good for final release, re-structure the folders.
-- Blender Scripts
-- Tri extractor
-- Guide (further broken down)
-
+	Covered in its own guide, almost completed.
 
 --------
 To do in a later update:
 	- Facegen exported textures.
+	- Scripts for handling male outfits.
+	- Cover how to deal with it if the applying shapes fails.
+	
