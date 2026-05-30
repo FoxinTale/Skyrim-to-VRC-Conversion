@@ -1,0 +1,31 @@
+There is a bit of an already created working directory in the project, feel free to use, or not use.
+Do know that this guide is setup assuming you are using the included folders.
+You can ignore the text files within, they're just there as a helpful guide.
+
+You can move the included folder named Skyrim to VRC port anywhere. 
+If you're porting a specific character you've made, I suggest renaming the folder to this character's name.
+
+Locating the resources we need:
+	This is an optional step if the mod you want to use is small, but I'll include it.
+	You can open your plugin in xEdit, expand its records and take note of the file paths.
+
+
+If files are packed:
+	If the mod you want (or are extracting from the base game) is packed in a BSA (Bethesda Studios Archive) file, 
+	we'll need to open it in Bethesda Archive Extrator (BAE).
+
+	So, open BAE and drag / drop the archive we want over. Click the "select none". Then navigate the dropdown to the files we want.
+	Typically for bodies go to "actors --> character --> character asssets" But if you're unsure, see the previous step for locating the proper path.
+	You can click the checkbox, then "extract". Extract to whatever folder you like, as long as you remember what and where it is.
+
+	If you're extracting from the base game, everything we want is in meshes0.bsa and textures0.bsa.
+
+
+Otherwise (and after unpacking):
+	Copy the files we want over to our working folders.
+	That's uh...that's it.
+
+Setup process done.
+		
+	
+

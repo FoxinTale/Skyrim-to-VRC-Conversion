@@ -9,12 +9,15 @@ For the textures:
 	Paint.net: https://getpaint.net/download.html#download
 	XNormal: https://shadermap.com/home/
 	GIMP: https://www.gimp.org/downloads/
-	Shadermap Pro (The free option are just fine for us): https://shadermap.com/home/
+	Shadermap Pro (The free option is just fine for us): https://shadermap.com/home/
 
 Other, general tools:
 	x/SSE Edit.
 	Python, greater than 3.8 installed.
 	This entire repository. Otherwise you'll be doing tedious, long, long processes.
+
+Game:
+	Skyrim SE/AE with Racemenu installed at a minimum.
 
 
 This does assume you know the basic controls of Blender (controls), and basic computer knowledge. And know basic anatomy. Yes, I'm serious.
@@ -23,7 +26,7 @@ This does assume you know the basic controls of Blender (controls), and basic co
 Overarching steps:
 
 Extract / get the models we want to use and setup folders.
-	Running Bethesda Archive Extractor.
+	Completed.
 
 Fixing the skeleton
 	Linking all the bones together, moving as needed and running the rename script.
@@ -38,7 +41,13 @@ The head:
 
 Outfits:
 	Covered in its own guide, almost completed.
-
+---------------
+To Do overall:
+	Finish Outfit guide.
+	Work on folder structure.
+	Scripts for HIMBO and UUNP
+	Organise the Blender scripts.
+	
 --------
 To do in a later update:
 	- Facegen exported textures.

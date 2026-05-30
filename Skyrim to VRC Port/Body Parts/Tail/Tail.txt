@@ -1,0 +1,7 @@
+Should have the following:
+<model name>.nif
+
+OR:
+modelname_1.nif
+
+Also a modelname.tri.
