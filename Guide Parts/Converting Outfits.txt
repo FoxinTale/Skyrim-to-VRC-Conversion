@@ -63,7 +63,7 @@ Dealing with the materials:
 Save your Blender project, and export as FBX with export settings FBX all, no Leaf Bones, and no animation.
 
 
-IF your mesh has multiple parts:
+If your mesh has multiple parts:
 	You'll need to repeat the above steps until you're totally done.
 	Import each FBX into a new project. 
 	Delete the armature from all but one.
@@ -73,6 +73,8 @@ IF your mesh has multiple parts:
 	You may be able to join the meshes if they share the same material.
 	Check the UVMap under materials before you do so, and make sure each part has the same map name. 
 	
+
+Once this is all done we can now export our finished outfit. Yay. 
 
 	
 			

@@ -6,29 +6,22 @@ import bpy
 # Sorts them similar to how they are displayed in bodyslide.
 # ----------------------------
 DIV_FULLBODY = "----- Full Body -----"
-DIV_TORSO = "----- Torso -----"
-DIV_ARMS = "----- Arms -----"
-DIV_HIPS = "----- Hips -----"
-DIV_LEGSFEET = "----- Legs and Feet -----"
-DIV_MUSCLES = "----- Muscles -----"
-DIV_BELLY = "----- Belly -----"
-DIV_BREASTS = "----- Breasts -----"
+DIV_TORSO = "----- Stature -----"
+DIV_ARMS = "----- Arms and Shoulders -----"
+DIV_LEGSFEET = "----- Thighs and Legs -----"
+DIV_MUSCLES = "----- Pecs -----"
 DIV_BUTT = "----- Butt -----"
 DIV_NIPS = "----- Nipples -----"
-DIV_BITS = "----- Vaginal and Anal -----" # Why are people so thirsty
 DIV_OTHER = " ----- Other -----"
 
 
 # All of our shapekeys needed.
 FULLBODY_KEYS = [
-    "7B Lower",
-    "7B Upper",
-    "AnkleSize",
-    "NeckSeam",
-    "OldBaseShape",
-    "VanillaSSEHi",
-    "VanillaSSELo",
-    "WristSize",
+    "Chubby",
+    "Lean",
+    "Muscle",
+    "SOSLike",
+    "Weight 0 to 1",
 ]
 
 TORSO_KEYS = [
@@ -104,45 +97,6 @@ MUSCLE_KEYS = [
     "MusclePecs",
 ]
 
-BELLY_KEYS = [
-    "BigBelly",
-    "BellyFrontDownFat_v2",
-    "BellyFrontUpFat_v2",
-    "BellySideDownFat_v2",
-    "BellySideUpFat_v2",
-    "PregnancyBelly",
-    "Belly",
-    "TummyTuck",
-    "BellyUnder_v2",
-]
-
-BREAST_KEYS = [
-    "BreastCenter",
-    "BreastCenterBig",
-    "BreastCleavage",
-    "BreastsConverage_v2",
-    "BreastsFantasy",
-    "BreastFlatness",
-    "BreastsGone",
-    "BreastGravity2",
-    "BreastHeight",
-    "DoubleMelon",
-    "BreastFlatness2",
-    "BreastPerkiness",
-    "BreastsPressed_v2",
-    "BreastsTogether",
-    "PushUp",
-    "BreastSideShape",
-    "BreastsNewSH",
-    "BreastsNewSHSymmetry",
-    "Breasts",
-    "BreastsSmall",
-    "BreastsSmall2",
-    "BreastTopSlope",
-    "BreastUnderDepth",
-    "BreastWidth",
-]
-
 BUTT_KEYS = [
     "AppleCheeks",
     "BigButt",
@@ -187,32 +141,6 @@ NIPPLE_KEYS = [
     "NippleTip",
     "NippleTube_v2",
     "NippleTipManga", # Somehow, this is twisty nips.
-]
-
-# *sigh*
-BITS_KEYS = [
-    "AnalPosition_v2",
-    "AnalLoose_v2",
-    "AnalTexPos_v2",
-    "AnalTexPosRe_v2",
-    "ClitSwell_v2",
-    "Clit",
-    "CBPC", # Crotch Puffy
-    "Cutepuffyness",
-    "CrotchGap",
-    "VaginaHole", # Hole Size
-    "Innieoutie",
-    "LabiaBulgogi_v2",
-    "LabiaCrumpled_v2",
-    "Labiaprotrude",
-    "Labiaprotrude2",
-    "Labiaspread",
-    "Labiapuffyness",
-    "LabiaMorePuffyness_v2",
-    "LabiaNeat_v2",
-    "Labiaprotrudeback",
-    "LabiaTightUp",
-    "Vaginasize",
 ]
 
 
@@ -283,44 +211,33 @@ if norm(kb[0].name) != norm("Basis"):
 ensure_divider(obj, DIV_FULLBODY)
 ensure_divider(obj, DIV_TORSO)
 ensure_divider(obj, DIV_ARMS)
-ensure_divider(obj, DIV_HIPS)
 ensure_divider(obj, DIV_LEGSFEET)
 ensure_divider(obj, DIV_MUSCLES)
-ensure_divider(obj, DIV_BELLY)
-ensure_divider(obj, DIV_BREASTS)
 ensure_divider(obj, DIV_BUTT)
 ensure_divider(obj, DIV_NIPS)
-ensure_divider(obj, DIV_BITS)
+ensure_divider(obj, DIV_OTHER)
 
 # Build ordered plan
 fullbody = unique_existing(obj, FULLBODY_KEYS)
 torso = unique_existing(obj, TORSO_KEYS)
 arms = unique_existing(obj, ARM_KEYS)
-hips = unique_existing(obj, HIP_KEYS)
 legsfeet = unique_existing(obj, LEGSFEET_KEYS)
 muscles = unique_existing(obj, MUSCLE_KEYS)
-belly = unique_existing(obj, BELLY_KEYS)
-breasts = unique_existing(obj, BREAST_KEYS)
 butt = unique_existing(obj, BUTT_KEYS)
 nipples = unique_existing(obj, NIPPLE_KEYS)
-bits = unique_existing(obj, BITS_KEYS)
 
 # Names to exclude from "everything else"
 divider_set = {
     norm(DIV_FULLBODY), 
     norm(DIV_TORSO),
     norm(DIV_ARMS),
-    norm(DIV_HIPS),
     norm(DIV_LEGSFEET),
     norm(DIV_MUSCLES),
-    norm(DIV_BELLY),
-    norm(DIV_BREASTS),
     norm(DIV_BUTT),
     norm(DIV_NIPS),
-    norm(DIV_BITS),
 }
 
-listed_set = {norm(n) for n in fullbody + torso + arms + hips + legsfeet + muscles + breasts + butt + nipples + bits}
+listed_set = {norm(n) for n in fullbody + torso + arms + legsfeet + muscles + butt + nipples}
 listed_set |= divider_set
 listed_set.add(norm("Basis"))
 
@@ -345,11 +262,6 @@ for name in torso:
 target = move_name_to_index(obj, DIV_ARMS, target)
 for name in arms:
     target = move_name_to_index(obj, name, target)
-
-# Hips
-target = move_name_to_index(obj, DIV_HIPS, target)
-for name in hips:
-    target = move_name_to_index(obj, name, target)
       
 # Legs and Feet
 target = move_name_to_index(obj, DIV_LEGSFEET, target)
@@ -361,16 +273,6 @@ target = move_name_to_index(obj, DIV_MUSCLES, target)
 for name in muscles:
     target = move_name_to_index(obj, name, target)
     
-# Belly
-target = move_name_to_index(obj, DIV_BELLY, target)
-for name in belly:
-    target = move_name_to_index(obj, name, target)
-    
-# Breasts
-target = move_name_to_index(obj, DIV_BREASTS, target)
-for name in breasts:
-    target = move_name_to_index(obj, name, target)
-
 # Butt    
 target = move_name_to_index(obj, DIV_BUTT, target)
 for name in butt:
@@ -379,11 +281,6 @@ for name in butt:
 # Nipples    
 target = move_name_to_index(obj, DIV_NIPS, target)
 for name in nipples:
-    target = move_name_to_index(obj, name, target)
-    
-# The female parts.
-target = move_name_to_index(obj, DIV_BITS, target)
-for name in bits:
     target = move_name_to_index(obj, name, target)
     
 # Anything else not covered.

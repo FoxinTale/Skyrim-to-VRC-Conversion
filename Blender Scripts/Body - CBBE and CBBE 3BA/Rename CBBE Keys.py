@@ -29,7 +29,7 @@ RENAME_MAP = {
     "NavelEven": "Navel Even",
     "RibsMore_v2": "Ribs",
     "RibsProminance": "Protruded Ribs",
-    "Torso": "Torso Size",
+    "BigTorso": "Torso Size",
     "SternumDepth": "Sternum Depth",
     "SternumHeight": "Sternum Height",
     "WaistHeight": "Waist Height",

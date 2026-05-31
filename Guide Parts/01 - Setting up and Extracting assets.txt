@@ -23,6 +23,11 @@ If files are packed:
 
 Otherwise (and after unpacking):
 	Copy the files we want over to our working folders.
+	Generally, the files we want are as follows, replacing x with male or female:
+		xeyes.nif, xbrows.nif, xhead.nif, xhands_1.nif, xbody_1.nif, xfeet_1.nif.
+
+	The file names may not be exactly as above, but this is enough to get an idea of what we want. 
+	
 	That's uh...that's it.
 
 Setup process done.

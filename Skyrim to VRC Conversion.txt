@@ -44,9 +44,7 @@ Outfits:
 ---------------
 To Do overall:
 	Finish Outfit guide.
-	Work on folder structure.
 	Scripts for HIMBO and UUNP
-	Organise the Blender scripts.
 	
 --------
 To do in a later update:
