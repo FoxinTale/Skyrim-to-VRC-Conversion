@@ -6,58 +6,45 @@ public class Main {
         //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
         // to see how IntelliJ IDEA suggests fixing it.
         System.out.println("Hello and welcome!");
-        File xmlFile = new File("CBBE 3BA.xml");
+        File xmlFile = new File("HIMBO.xml");
 
- //       ReadXML.readXML(xmlFile);
+
         Map<String, ArrayList<Slider>> xmlData = ReadXML.readSliderFile(xmlFile);
-        ArrayList<String> dividers = WriteShapekeySorter.makeDividers(xmlData);
-        ArrayList<String> keys = WriteShapekeySorter.makeKeys(xmlData);
-        printSliderSorter(xmlData, dividers, keys);
+        printKeyRenamer(xmlData);
+ //       ArrayList<String> dividers = WriteShapekeySorter.makeDividers(xmlData);
+ //       ArrayList<String> keys = WriteShapekeySorter.makeKeys(xmlData);
+ //       WriteShapekeySorter.printSliderSorter(xmlData, dividers, keys);
 
         System.out.println();
     }
 
-    public static void printSliderSorter(Map<String, ArrayList<Slider>> xmlData, ArrayList<String> dividers, ArrayList<String> keys){
-        String tab = "\u0009";
-        ArrayList<String> divNames = new ArrayList<>();
-        Set<String> names = xmlData.keySet();
-        ArrayList<Slider> category;
-        Set<Map.Entry<String, ArrayList<Slider>>> entries = new TreeSet<>();
-
-        for (Map.Entry<String, ArrayList<Slider>> entry : xmlData.entrySet()) {
-            divNames.add(entry.getKey());
-        }
+    public static void printKeyRenamer(Map<String, ArrayList<Slider>> xmlData){
+        Set<Map.Entry<String, ArrayList<Slider>>> entries;
         entries = xmlData.entrySet();
+        ArrayList<Slider> category;
+        String tab = "\u0009";
+
         System.out.println("import bpy");
-        System.out.println("# A Blender script to easily sort the shapekeys of an outfit, or bodytype when porting from Skyrim");
-        System.out.println("\n");
-        System.out.println("# Dividers section");
-
-
-        for(int a = 0; a < dividers.size(); a++){
-            System.out.println(dividers.get(a) + " = \"----- " + divNames.get(a) + " -----\"");
-        }
-
+        System.out.println("# Blender script file to rename skapekeys into something we can make more sense of.");
+        System.out.println("# ----------------------------");
+        System.out.println("CASE_INSENSITIVE = True");
+        System.out.println("ONLY_ACTIVE_OBJECT = True   # False = rename on all selected meshes");
+        System.out.println("SKIP_IF_TARGET_EXISTS = True  # don't overwrite if the target name already exists");
         System.out.println();
-
-        int iterator = 0;
+        System.out.println("RENAME_MAP = {");
         for(Map.Entry<String, ArrayList<Slider>> entry: entries){
             category = entry.getValue();
+            Slider slider;
 
-            System.out.println(keys.get(iterator) + " = [");
-
-            for(Slider slider: category){
-                for (ArrayList<Slider> sliders : sliderCategories.values()) {
-                    sliders.sort((a, b) -> a.getName().compareTo(b.getName()));
-                }
-                System.out.println(tab + "\"" + slider.name + "\",");
+            for(int i = 0; i < category.size(); i++){
+                slider = category.get(i);
+                System.out.println(tab + "\"" + slider.getName() + "\": \"" + slider.displayName + "\",");
             }
-            System.out.println("]\n");
-            iterator += 1;
+            System.out.println();
         }
-
+        System.out.println("}");
         System.out.println();
 
-
     }
+
 }

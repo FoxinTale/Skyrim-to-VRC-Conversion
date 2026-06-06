@@ -20,6 +20,4 @@ public class NifMesh {
         this.faces = faces;
     }
 
-
-
 }

@@ -32,85 +32,53 @@ public class WriteShapekeySorter {
         return keys;
     }
 
-    public static void printSliderSorter(Map<String, ArrayList<Slider>> xmlData, ArrayList<String> dividers, ArrayList<String> keys){
-        String tab = "\u0009";
-
-        System.out.println("import bpy");
-        System.out.println("# A Blender script to easily sort the shapekeys of an outfit, or bodytype when porting from Skyrim");
-        System.out.println("\n");
-        System.out.println("# Dividers section");
-
-
-    }
-
-
 
 
     // Yeah, we're literally writing Python with Java. Imagine a snake coming out of a coffee cup. ...caffinated boop noodle.
-    public static void printSorter(ArrayList<String> categoryNames, ArrayList<ArrayList<Map<String, String>>> sliderSets) {
+    public static void printSliderSorter(Map<String, ArrayList<Slider>> xmlData, ArrayList<String> dividers, ArrayList<String> keys){
         String tab = "\u0009";
-        String varName;
-        ArrayList<Map<String,String>> tempList;
-        Map<String, ArrayList<Map<String, String>>> sliderCategories = new TreeMap<>();
+        ArrayList<String> divNames = new ArrayList<>();
+        ArrayList<Slider> category;
+        ArrayList<String> sliders;
+        ArrayList<String> categories = new ArrayList<>();
+        Set<Map.Entry<String, ArrayList<Slider>>> entries;
+        StringBuilder sb = new StringBuilder();
 
-        for(int a = 0; a < categoryNames.size(); a++){
-            sliderCategories.put(categoryNames.get(a),sliderSets.get(a));
+        for (Map.Entry<String, ArrayList<Slider>> entry : xmlData.entrySet()) {
+            divNames.add(entry.getKey());
         }
-
-        ArrayList<String> keysList = new ArrayList<>();
-        ArrayList<String> dividers = new ArrayList<>();
-        ArrayList<String> lists = new ArrayList<>();
-
-  //      categoryNames.add("Other");
-
-        for(String key: sliderCategories.keySet()){
-            dividers.add("DIV_" + key.replaceAll("\\s+", "").toUpperCase());
-        }
-//        dividers.add("DIV_OTHER");
-
-        for(int b = 0; b < sliderSets.size(); b++){
-            varName = categoryNames.get(b);
-            keysList.add(varName.replaceAll("\\s+", "").toUpperCase() + "_KEYS");
-        }
-
+        entries = xmlData.entrySet();
         System.out.println("import bpy");
         System.out.println("# A Blender script to easily sort the shapekeys of an outfit, or bodytype when porting from Skyrim");
         System.out.println("\n");
         System.out.println("# Dividers section");
 
-        for(String key: sliderCategories.keySet()){
-            System.out.println("DIV_" + key.replaceAll("\\s+", "").toUpperCase() + " = \"----- " + key + " -----\"");
+
+        for(int a = 0; a < dividers.size(); a++){
+            System.out.println(dividers.get(a) + " = \"----- " + divNames.get(a) + " -----\"");
         }
-
-        System.out.println("\n");
-        System.out.println("# The actual, important blendshape keys table.");
-
+        // We do hardcode this one as this will not change depending on the file we're reading. It's a catch-all.
+        System.out.println("DIV_OTHER = \" ----- Other -----\"");
 
         System.out.println();
 
-   //     for(int i = 0; i < sliderCategories.size(); i++){
+        int iterator = 0;
+        for(Map.Entry<String, ArrayList<Slider>> entry: entries){
+            category = entry.getValue();
+            sliders = new ArrayList<>();
+            System.out.println(keys.get(iterator) + " = [");
 
-   //     }
-
- /*
-        for(int d = 0; d < sliderSets.size(); d++){
-            keys = new ArrayList<>();
-            tempList = sliderSets.get(d);
-            System.out.println(keysList.get(d) + " = [");
-
-            for(int e = 0; e < tempList.size(); e++){
-                keys.add(tempList.get(e).keySet().toString().replace("[", "").replace("]", "").trim());
+            for(Slider slider: category){
+                sliders.add(slider.getName());
             }
-            Collections.sort(keys);
+            Collections.sort(sliders);
 
-            for(int m = 0; m < keys.size(); m ++){
-                System.out.println(tab + "\"" + keys.get(m) + "\",");
+            for (String slider : sliders) {
+                System.out.println(tab + "\"" + slider + "\",");
             }
-            System.out.println("]");
-            System.out.println();
+            System.out.println("]\n");
+            iterator += 1;
         }
-  */
-        System.out.println();
 
         System.out.println("CASE_INSENSITIVE = True");
         System.out.println("# ----------------------------");
@@ -175,49 +143,48 @@ public class WriteShapekeySorter {
         System.out.println(tab + "pass");
         System.out.println();
         System.out.println("# Create divider keys (if needed)");
-        
-        for(int f = 0; f < dividers.size(); f++){
-            System.out.println("ensure_divider(obj, " + dividers.get(f) + ")" );
+
+        for (String divider : dividers) {
+            System.out.println("ensure_divider(obj, " + divider + ")");
         }
-        System.out.println();
-
-
-        System.out.println("# Building the lists.");
-        for(int g = 0; g < categoryNames.size(); g ++){
-            varName = categoryNames.get(g);
-            lists.add(varName.replaceAll("\\s+", "").toLowerCase());
-        }
-
-
-        for(int h = 0; h < lists.size() - 1; h++){
-            System.out.println(
-                    lists.get(h) + " = unique_existing(obj, " + keysList.get(h) + ")"
-            );
-        }
+        System.out.println("ensure_divider(obj, DIV_OTHER)");
 
         System.out.println();
-        System.out.println("# What to exclude from everything else we want.");
-        System.out.println("divider_set = {");
-        for(int i = 0; i < dividers.size(); i++){
-            System.out.println(
-                    tab + "norm(" + dividers.get(i) + "),"
-            );
-        }
-        System.out.println("}");
         System.out.println();
+        for (String key : keys) {
+            categories.add(key.toLowerCase().replace("_keys", "").trim());
+        }
 
-        StringBuilder sb = new StringBuilder();
-        for(int j = 0; j < lists.size() - 1; j++){
-            if(j < lists.size() - 2){
-                sb.append(lists.get(j) + " + ");
-            } else{
-                sb.append(lists.get(j));
+        if(keys.size() == categories.size()){
+            for(int i = 0; i < keys.size(); i++){
+                System.out.println(categories.get(i) + " = unique_existing(obj, " + keys.get(i) + ")");
             }
+        } else {
+            System.out.println("List sizes do not match. (Keys and Categories)");
         }
-        System.out.println("listed_set = {norm(n) for n in " + sb.toString() + "}");
+
+        System.out.println();
+        System.out.println();
+
+        System.out.println("divider_set = {");
+        for (String divider : dividers) {
+            System.out.println(tab + "norm(" + divider + "),");
+        }
+        System.out.println(tab + "norm(DIV_OTHER),");
+        System.out.println("}");
+
+        System.out.println();
+        System.out.println();
+        sb.append("listed_set = {norm(n) for n in ");
+        for(int i = 0; i < categories.size() - 1; i++){
+            sb.append(categories.get(i) + " + ");
+        }
+
+        sb.append(categories.get(categories.size() - 1) + "}");
+
+        System.out.println(sb.toString());
         System.out.println("listed_set |= divider_set");
         System.out.println("listed_set.add(norm(\"Basis\"))\n");
-
         System.out.println();
         System.out.println("# Collect \"everything else\"");
         System.out.println("all_names = [k.name for k in obj.data.shape_keys.key_blocks]");
@@ -228,13 +195,20 @@ public class WriteShapekeySorter {
         System.out.println("target = 1  # index after Basis");
         System.out.println();
 
-        for(int k = 0; k < dividers.size() - 1; k++){
-            System.out.println("# " + categoryNames.get(k));
-            System.out.println("target = move_name_to_index(obj, " + dividers.get(k) + ", target)");
-            System.out.println("for name in " + lists.get(k) + ":");
-            System.out.println(tab + "target = move_name_to_index(obj, name, target)");
-            System.out.println();
+        if(dividers.size() == categories.size()){
+            for(int i = 0; i < dividers.size(); i++){
+                System.out.println("target = move_name_to_index(obj, " + dividers.get(i) + ", target)");
+                System.out.println("for name in " + categories.get(i) + ":");
+                System.out.println(tab + "target = move_name_to_index(obj, name, target)");
+                System.out.println();
+            }
+        } else {
+            System.out.println("List sizes do not match. (Dividers and Categories)");
         }
+
+        System.out.println("target = move_name_to_index(obj, DIV_OTHER, target)");
+        System.out.println("for name in everything_else:");
+        System.out.println(tab + "target = move_name_to_index(obj, name, target)");
         System.out.println();
         System.out.println("print(\"Done: created dividers and reorganized shape keys.\")");
     }
