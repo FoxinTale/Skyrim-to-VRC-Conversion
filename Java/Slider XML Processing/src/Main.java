@@ -38,7 +38,12 @@ public class Main {
 
             for(int i = 0; i < category.size(); i++){
                 slider = category.get(i);
-                System.out.println(tab + "\"" + slider.getName() + "\": \"" + slider.displayName + "\",");
+                if(slider.getDisplayName().contains("Size")){
+                    System.out.println(slider.getName() + " : " + slider.getDisplayName());
+                } else {
+//                    System.out.println(tab + "\"" + slider.getName() + "\": \"" + slider.displayName + "\",");
+                    System.out.println(slider.getDisplayName());
+                }
             }
             System.out.println();
         }

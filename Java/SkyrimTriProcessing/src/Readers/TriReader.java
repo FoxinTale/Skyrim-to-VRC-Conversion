@@ -74,25 +74,4 @@ public class TriReader {
         return new TriData(shapes, hasUvSection);
     }
 
-    public static void printTriSummary(TriData tri) {
-        System.out.println("Shapes: " + tri.shapes.size());
-        System.out.println("Has UV section: " + tri.hasUvSection);
-
-        for (TriShape shape : tri.shapes) {
-            System.out.println();
-            System.out.println("Shape: " + shape.name);
-            System.out.println("  Morphs: " + shape.morphs.size());
-
-            for (Morph morph : shape.morphs) {
-                System.out.println("    Morph: " + morph.name);
-                System.out.println("      Multiplier: " + morph.multiplier);
-                System.out.println("      Changed count: " + morph.changedCount);
-                System.out.println("      Vertices read: " + morph.vertices.size());
-
-                if (morph.changedCount != morph.vertices.size()) {
-                    System.out.println("      WARNING: changedCount does not match vertices.size()");
-                }
-            }
-        }
-    }
 }

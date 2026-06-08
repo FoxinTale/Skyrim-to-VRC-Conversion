@@ -1,5 +1,7 @@
 package Readers;
 
+import NifData.NifBlock;
+
 public class BlockReader {
     private byte[] data;
     private int pos = 0;
@@ -68,5 +70,28 @@ public class BlockReader {
 
         pos += 4;
         return value;
+    }
+
+
+    public static void debugVertexRecordLayout(
+            NifBlock block,
+            int vertexBufferStart,
+            int vertexStride
+    ) {
+        for (int i = 0; i < 3; i++) {
+            int base = vertexBufferStart + i * vertexStride;
+
+            System.out.println("Vertex " + i);
+
+            for (int off = 0; off <= vertexStride - 8; off += 4) {
+                BlockReader r = new BlockReader(block.data);
+                r.skip(base + off);
+
+                float a = r.readF32();
+                float b = r.readF32();
+
+                System.out.println("  +" + off + ": " + a + ", " + b);
+            }
+        }
     }
 }

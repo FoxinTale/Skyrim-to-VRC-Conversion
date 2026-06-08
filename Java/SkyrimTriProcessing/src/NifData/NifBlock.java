@@ -12,5 +12,4 @@ public class NifBlock {
         this.size = size;
         this.data = data;
     }
-
 }

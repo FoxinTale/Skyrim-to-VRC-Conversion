@@ -34,7 +34,7 @@ public class ObjWriter {
         }
     }
 
-    private static void write(
+    static void write(
             PrintWriter out,
             String objectName,
             ArrayList<Vertex> vertices,
