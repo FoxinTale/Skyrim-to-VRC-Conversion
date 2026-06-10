@@ -1,12 +1,14 @@
 package NifData;
 
 import Geometry.Face;
+import Geometry.UV;
 import Geometry.Vertex;
 import Readers.BlockReader;
 
 import java.io.IOException;
 import java.util.ArrayList;
 
+import static Geometry.UV.looksLikeUv;
 
 
 public class NiSkinPartition {
@@ -26,7 +28,9 @@ public class NiSkinPartition {
     public ArrayList<Integer> bones = new ArrayList<>();
     public ArrayList<Integer> vertexMap = new ArrayList<>();
     public ArrayList<Integer> stripLengths;
-    public static ArrayList<Vertex> objVertices;   // render/export vertex order
+    public ArrayList<Vertex> objVertices;   // render/export vertex order
+    public ArrayList<UV> uvs = new ArrayList<>();
+    public ArrayList<UV> objUvs = new ArrayList<>();
 
     public int numVertices;
     public int numTriangles;
@@ -86,23 +90,55 @@ public class NiSkinPartition {
         int vertexCount = vertexDataSize / vertexStride;
         int vertexBufferEnd = vertexBufferStart + vertexDataSize;
 
+//        BlockReader.debugVertexRecordLayout(block, vertexBufferStart, vertexStride);
+
         ArrayList<Vertex> vertices = new ArrayList<>();
+
+
+        // UV handling section.
+
+        ArrayList<UV> uvs = new ArrayList<>();
+        int uvOffset = 0x10;
+
+
 
         for (int i = 0; i < vertexCount; i++) {
             BlockReader vr = new BlockReader(block.data);
             vr.skip(vertexBufferStart + i * vertexStride);
 
-            float x = vr.readF32();
-            float y = vr.readF32();
-            float z = vr.readF32();
+            vertices.add(new Vertex(
+                    vr.readF32(),
+                    vr.readF32(),
+                    vr.readF32()
+            ));
 
-            vertices.add(new Vertex(x, y, z));
+            if (uvOffset >= 0) {
+                BlockReader ur = new BlockReader(block.data);
+                ur.skip(vertexBufferStart + i * vertexStride + uvOffset);
+
+                float u = ur.readF16();
+                float v = ur.readF16();
+
+/*                if (!looksLikeUv(u, v)) {
+                    u = 0.0f;
+                    v = 0.0f;
+                }*/
+
+    //            uvs.add(new UV(u, v));
+                uvs.add(new UV(u, 1.0f - v));
+            } else {
+    //            uvs.add(new UV(0.0f, 0.0f));
+                System.out.println(uvOffset);
+            }
         }
+
 
         BlockReader post = new BlockReader(block.data);
         post.skip(vertexBufferEnd);
 
         ArrayList<Vertex> objVertices = new ArrayList<>();
+        ArrayList<UV> objUvs = new ArrayList<>();
+
         ArrayList<Face> faces = new ArrayList<>();
         ArrayList<Integer> bones = new ArrayList<>();
         ArrayList<Integer> vertexMap = new ArrayList<>();
@@ -187,12 +223,6 @@ public class NiSkinPartition {
             int lodLevel = post.readU8();
             boolean globalVb = post.readBoolU8();
 
-            System.out.println("Partition " + p);
-            System.out.println("  hasVertexMap = " + hasVertexMap);
-            System.out.println("  hasVertexWeights = " + hasVertexWeights);
-            System.out.println("  hasFaces = " + hasFaces);
-            System.out.println("  hasBoneIndices = " + hasBoneIndices);
-
             post.skip(8); // partition vertex descriptor
 
             int bytesLeft = block.data.length - post.position();
@@ -210,9 +240,30 @@ public class NiSkinPartition {
                 post.readU16();
             }
 
-            for (Face f : partitionFaces) {
-                faces.add(f);
+
+
+            int renderStart = objVertices.size();
+
+            if (!partitionVertexMap.isEmpty()) {
+                for (int globalIndex : partitionVertexMap) {
+                    objVertices.add(vertices.get(globalIndex));
+                    objUvs.add(uvs.get(globalIndex));
+                }
+            } else {
+                for (int i = 0; i < numVertices; i++) {
+                    objVertices.add(vertices.get(i));
+                    objUvs.add(uvs.get(i));
+                }
             }
+
+            for (Face f : partitionFaces) {
+                faces.add(new Face(
+                        renderStart + f.a,
+                        renderStart + f.b,
+                        renderStart + f.c
+                ));
+            }
+
         }
 
         NiSkinPartition partition = new NiSkinPartition();
@@ -230,6 +281,8 @@ public class NiSkinPartition {
 
         partition.vertices = vertices;       // raw/shared vertex buffer
         partition.objVertices = objVertices; // export/render vertex order
+        partition.uvs = uvs;
+        partition.objUvs = objUvs;
         partition.faces = faces;
         partition.bones = bones;
         partition.vertexMap = vertexMap;

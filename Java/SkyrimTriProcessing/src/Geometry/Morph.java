@@ -41,4 +41,14 @@ public class Morph {
 
         return result;
     }
+
+    public static int countMorphs(TriData triData) {
+        int total = 0;
+
+        for (TriShape shape : triData.shapes) {
+            total += shape.morphs.size();
+        }
+
+        return total;
+    }
 }

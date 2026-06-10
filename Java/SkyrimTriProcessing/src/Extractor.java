@@ -34,16 +34,10 @@ public class Extractor {
                 continue;
             }
 
-            NifSkinInstance skin =
-                    NifSkinInstance.readSkinInstance(nif, shape.skinInstanceRef);
-
-            NiSkinPartition partition =
-                    NiSkinPartition.readSkinPartition(nif, skin.skinPartitionRef);
-
-            ArrayList<Vertex> baseVertices =
-                    !partition.objVertices.isEmpty()
-                            ? partition.objVertices
-                            : partition.vertices;
+            NifSkinInstance skin = NifSkinInstance.readSkinInstance(nif, shape.skinInstanceRef);
+            NiSkinPartition partition = NiSkinPartition.readSkinPartition(nif, skin.skinPartitionRef);
+            ArrayList<Vertex> baseVertices = chooseExportVertices(partition);
+            ArrayList<UV> baseUvs = chooseExportUvs(partition);
 
             // Base mesh goes directly in root folder
             File baseFile = new File(
@@ -51,12 +45,14 @@ public class Extractor {
                     safeFileName(shape.name) + ".obj"
             );
 
+
             try (PrintWriter out = new PrintWriter(new FileWriter(baseFile))) {
                 ObjWriter.write(
                         out,
                         shape.name,
                         baseVertices,
-                        partition.faces
+                        partition.faces,
+                        baseUvs
                 );
             }
 
@@ -80,6 +76,8 @@ public class Extractor {
                         safeFileName(morph.name) + ".obj"
                 );
 
+
+
                 try (PrintWriter out = new PrintWriter(new FileWriter(morphFile))) {
                     ObjWriter.write(
                             out,
@@ -88,11 +86,48 @@ public class Extractor {
                             partition.faces
                     );
                 }
+                System.out.println(" Wrote " + morph.name + " for shape " + triShape.name + ".");
             }
+            System.out.println(" "+ triShape.name + " extracted");
         }
+        System.out.println(" Extraction Complete");
     }
 
+    private static ArrayList<Vertex> chooseExportVertices(NiSkinPartition partition) {
+        int maxFaceIndex = getMaxFaceIndex(partition.faces);
 
+        if (partition.objVertices != null
+                && !partition.objVertices.isEmpty()
+                && maxFaceIndex < partition.objVertices.size()) {
+            return partition.objVertices;
+        }
+
+        return partition.vertices;
+    }
+
+    private static ArrayList<UV> chooseExportUvs(NiSkinPartition partition) {
+        int maxFaceIndex = getMaxFaceIndex(partition.faces);
+
+        if (partition.objUvs != null
+                && !partition.objUvs.isEmpty()
+                && maxFaceIndex < partition.objUvs.size()) {
+            return partition.objUvs;
+        }
+
+        return partition.uvs;
+    }
+
+    private static int getMaxFaceIndex(ArrayList<Face> faces) {
+        int max = -1;
+
+        for (Face f : faces) {
+            max = Math.max(max, f.a);
+            max = Math.max(max, f.b);
+            max = Math.max(max, f.c);
+        }
+
+        return max;
+    }
 
     private static String safeFileName(String name) {
         return name.replaceAll("[\\\\/:*?\"<>|]", "_");

@@ -1,0 +1,2 @@
+This starts off with assuming you have already completed the previous step of setting up all programs and using the default provided folder.
+

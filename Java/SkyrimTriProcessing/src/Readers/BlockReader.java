@@ -1,7 +1,5 @@
 package Readers;
 
-import NifData.NifBlock;
-
 public class BlockReader {
     private byte[] data;
     private int pos = 0;
@@ -72,26 +70,41 @@ public class BlockReader {
         return value;
     }
 
+    public float readF16() {
+        int h = readU16();
 
-    public static void debugVertexRecordLayout(
-            NifBlock block,
-            int vertexBufferStart,
-            int vertexStride
-    ) {
-        for (int i = 0; i < 3; i++) {
-            int base = vertexBufferStart + i * vertexStride;
+        int sign = (h >>> 15) & 0x00000001;
+        int exp  = (h >>> 10) & 0x0000001F;
+        int mant = h & 0x000003FF;
 
-            System.out.println("Vertex " + i);
+        int f;
 
-            for (int off = 0; off <= vertexStride - 8; off += 4) {
-                BlockReader r = new BlockReader(block.data);
-                r.skip(base + off);
+        if (exp == 0) {
+            if (mant == 0) {
+                f = sign << 31;
+            } else {
+                while ((mant & 0x00000400) == 0) {
+                    mant <<= 1;
+                    exp--;
+                }
 
-                float a = r.readF32();
-                float b = r.readF32();
+                exp++;
+                mant &= ~0x00000400;
 
-                System.out.println("  +" + off + ": " + a + ", " + b);
+                f = (sign << 31)
+                        | ((exp + (127 - 15)) << 23)
+                        | (mant << 13);
             }
+        } else if (exp == 31) {
+            f = (sign << 31)
+                    | 0x7F800000
+                    | (mant << 13);
+        } else {
+            f = (sign << 31)
+                    | ((exp + (127 - 15)) << 23)
+                    | (mant << 13);
         }
+
+        return Float.intBitsToFloat(f);
     }
 }

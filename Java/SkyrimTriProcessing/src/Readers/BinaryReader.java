@@ -23,36 +23,10 @@ public class BinaryReader {
         return data;
     }
 
-    public static int readI32(InputStream in) throws IOException {
-        return readI32(in, "i32");
-    }
-
-    public static int readI32(InputStream in, String label) throws IOException {
-        byte[] b = readExact(in, 4, label);
-
-        return (b[0] & 0xFF)
-                | ((b[1] & 0xFF) << 8)
-                | ((b[2] & 0xFF) << 16)
-                | ((b[3] & 0xFF) << 24);
-    }
-
-
-    public static int readU8(InputStream in) throws IOException {
-        return readU8(in, "u8");
-    }
-
     public static int readU8(InputStream in, String label) throws IOException {
         byte[] b = readExact(in, 1, label);
 
         return b[0] & 0xFF;
-    }
-
-    public static boolean readBoolU8(InputStream in, String label) throws IOException {
-        return readU8(in, label) != 0;
-    }
-
-    public static int readU16(InputStream in) throws IOException {
-        return readU16(in, "u16");
     }
 
     public static int readU16(InputStream in, String label) throws IOException {
@@ -62,9 +36,6 @@ public class BinaryReader {
                 | ((b[1] & 0xFF) << 8);
     }
 
-    public static String readStringU8(InputStream in) throws IOException {
-        return readStringU8(in, "string_u8");
-    }
 
     public static String readStringU8(InputStream in, String label) throws IOException {
         int length = readU8(in, label + "_length");
@@ -74,9 +45,6 @@ public class BinaryReader {
         return new String(data, StandardCharsets.UTF_8);
     }
 
-    public static float readF32(InputStream in) throws IOException {
-        return readF32(in, "f32");
-    }
 
     public static float readF32(InputStream in, String label) throws IOException {
         byte[] b = readExact(in, 4, label);
@@ -89,10 +57,6 @@ public class BinaryReader {
         return Float.intBitsToFloat(bits);
     }
 
-    public static short readI16(InputStream in) throws IOException {
-        return readI16(in, "i16");
-    }
-
     public static short readI16(InputStream in, String label) throws IOException {
         byte[] b = readExact(in, 2, label);
 
@@ -102,9 +66,6 @@ public class BinaryReader {
         return (short) value;
     }
 
-    public static long readU32(InputStream in) throws IOException {
-        return readU32(in, "u32");
-    }
 
     public static long readU32(InputStream in, String label) throws IOException {
         byte[] b = readExact(in, 4, label);

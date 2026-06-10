@@ -17,7 +17,9 @@ public class CustomOutputStream extends OutputStream {
 
     @Override
     public void write(int b) {
-        consoleOutput.append(String.valueOf((char) b));
-        consoleOutput.setCaretPosition(consoleOutput.getDocument().getLength());
+        SwingUtilities.invokeLater(() -> {
+            consoleOutput.append(String.valueOf((char) b));
+            consoleOutput.setCaretPosition(consoleOutput.getDocument().getLength());
+        });
     }
 }
