@@ -1,4 +1,6 @@
-package Geometry;
+package Tri;
+
+import Geometry.Morph;
 
 import java.util.List;
 

@@ -1,8 +1,12 @@
 import Geometry.*;
 import NifData.*;
 
+import Readers.FaceGenTriReader;
 import Readers.NifReader;
 import Readers.TriReader;
+import Tri.FaceGenTriData;
+import Tri.TriData;
+import Tri.TriShape;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -10,11 +14,53 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
-import static Geometry.TriShape.findTriShapeByName;
+import static Tri.TriShape.findTriShapeByName;
 
 
 public class Extractor {
-    public static void extractTriFile(File triFile, File nifFile, File outputFolder) throws IOException {
+
+    public static void extractFaceGenTriFile(File triFile, File outputFolder) throws IOException {
+        FaceGenTriData facegenTri = FaceGenTriReader.read(triFile);
+        outputFolder.mkdirs();
+
+        File baseFile = new File(outputFolder, stripExtension(triFile.getName()) +  "_base.obj");
+
+        try (PrintWriter out = new PrintWriter(new FileWriter(baseFile))) {
+            ObjWriter.write(
+                    out,
+                    "Base",
+                    facegenTri.vertices,
+                    facegenTri.faces,
+                    facegenTri.uvs
+            );
+        }
+
+        System.out.println("Wrote base mesh.");
+
+
+        for(FaceGenMorph morph : facegenTri.morphs){
+            ArrayList<Vertex> morphedVertices =
+                    Morph.applyMorphToVertices(
+                            facegenTri.vertices,
+                            morph.vertices
+                    );
+
+            File morphFile = new File(outputFolder, morph.name + ".obj");
+
+            try (PrintWriter out = new PrintWriter(new FileWriter(morphFile))) {
+                ObjWriter.write(
+                        out,
+                        morph.name,
+                        morphedVertices,
+                        facegenTri.faces
+                );
+            }
+            System.out.println("Wrote morph: " + morph.name);
+        }
+    }
+
+
+    public static void extractBodyslideTriFile(File triFile, File nifFile, File outputFolder) throws IOException {
         TriData triData = TriReader.readTri(triFile);
         NifData nif = NifReader.readNif(nifFile);
 
@@ -26,7 +72,6 @@ public class Extractor {
         }
 
         for (NifTriShape shape : shapes) {
-
             TriShape triShape = findTriShapeByName(triData, shape.name);
 
             if (triShape == null) {
@@ -131,5 +176,16 @@ public class Extractor {
 
     private static String safeFileName(String name) {
         return name.replaceAll("[\\\\/:*?\"<>|]", "_");
+    }
+
+
+    public static String stripExtension(String fileName) {
+        int dot = fileName.lastIndexOf('.');
+
+        if (dot <= 0) {
+            return fileName;
+        }
+
+        return fileName.substring(0, dot);
     }
 }

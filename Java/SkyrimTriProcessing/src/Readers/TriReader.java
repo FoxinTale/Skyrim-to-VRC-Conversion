@@ -2,8 +2,8 @@ package Readers;
 
 import Geometry.Morph;
 import Geometry.MorphVertex;
-import Geometry.TriData;
-import Geometry.TriShape;
+import Tri.TriData;
+import Tri.TriShape;
 
 import java.io.*;
 import java.util.*;

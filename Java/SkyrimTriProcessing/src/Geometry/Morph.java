@@ -1,5 +1,8 @@
 package Geometry;
 
+import Tri.TriData;
+import Tri.TriShape;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +19,30 @@ public class Morph {
         this.vertices = vertices;
     }
 
+    public static ArrayList<Vertex> applyMorphToVertices(
+            ArrayList<Vertex> baseVertices,
+            ArrayList<MorphVertex> morphVertices
+    ) {
+        ArrayList<Vertex> result = new ArrayList<>();
+
+        for (Vertex v : baseVertices) {
+            result.add(new Vertex(v.x, v.y, v.z));
+        }
+
+        for (MorphVertex mv : morphVertices) {
+            if (mv.index < 0 || mv.index >= result.size()) {
+                continue;
+            }
+
+            Vertex v = result.get(mv.index);
+
+            v.x += mv.x;
+            v.y += mv.y;
+            v.z += mv.z;
+        }
+
+        return result;
+    }
 
     public static ArrayList<Vertex> applyMorphToVertices(
             ArrayList<Vertex> baseVertices,

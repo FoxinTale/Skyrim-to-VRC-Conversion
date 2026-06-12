@@ -1,0 +1,38 @@
+I will include a more detailed guide .
+The stuff included in the "Guide parts" subfolder is just a basic skeleton, enough to build a more detailed guide on.
+
+It will be written in HTML, and break out into steps. This entire thing will be locally runnable, offline.
+It will be turned into a video series later on, but this is good enough for quite a bit.
+
+
+Index.html:
+	Introduction to the guide, explaining what it is, and the various contents of the release.
+
+Blender Guide:
+	Lists basic controls for Blender, and the various windows.
+	Includes keyboard controls with GIfs, not compressed because we're not on a bandwidth limit.
+
+
+Step 1:
+	Setup guide.
+
+Step 2:
+	Head Tri extraction and taking care of them.
+
+Step 2a:
+	Racemenu.
+
+Step 3:
+	Body Setup.
+
+Step 4: 
+	Converting Outfits
+
+Step 5: 
+	Converting Textures
+
+Step 6:
+	Bringing it all together in Blender
+
+
+Done. Once we're all done in Blender, it becomes a regular avatar setup and process.
