@@ -1,3 +1,5 @@
+package Core;
+
 import Geometry.Face;
 import Geometry.UV;
 import Geometry.Vertex;

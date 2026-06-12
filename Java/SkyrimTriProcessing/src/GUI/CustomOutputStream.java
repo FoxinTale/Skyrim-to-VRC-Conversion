@@ -5,7 +5,7 @@ import java.io.OutputStream;
 
 /*
 What this does, is it redirects and and all System.out and System.err calls
-and outputs them to the JTextArea in the GUI class. I found this was much easier to
+and outputs them to the JTextArea in the Core.GUI class. I found this was much easier to
 do than any other option.
 */
 public class CustomOutputStream extends OutputStream {

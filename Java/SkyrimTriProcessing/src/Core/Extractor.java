@@ -1,4 +1,8 @@
+package Core;
+
 import Geometry.*;
+import Lang.Localisation;
+import Lang.Strings;
 import NifData.*;
 
 import Readers.FaceGenTriReader;
@@ -18,6 +22,8 @@ import static Tri.TriShape.findTriShapeByName;
 
 
 public class Extractor {
+    private static final Strings strings = Localisation.getStrings();
+
 
     public static void extractFaceGenTriFile(File triFile, File outputFolder) throws IOException {
         FaceGenTriData facegenTri = FaceGenTriReader.read(triFile);
@@ -35,8 +41,7 @@ public class Extractor {
             );
         }
 
-        System.out.println("Wrote base mesh.");
-
+        Utils.print(strings.baseMeshWrote());
 
         for(FaceGenMorph morph : facegenTri.morphs){
             ArrayList<Vertex> morphedVertices =
@@ -55,7 +60,7 @@ public class Extractor {
                         facegenTri.faces
                 );
             }
-            System.out.println("Wrote morph: " + morph.name);
+            Utils.print(strings.morphWrite() + morph.name);
         }
     }
 
@@ -75,19 +80,19 @@ public class Extractor {
             TriShape triShape = findTriShapeByName(triData, shape.name);
 
             if (triShape == null) {
-                System.out.println("No TRI shape for " + shape.name);
+                Utils.print(strings.noTriForMesh() + shape.name);
                 continue;
             }
 
             NifSkinInstance skin = NifSkinInstance.readSkinInstance(nif, shape.skinInstanceRef);
             NiSkinPartition partition = NiSkinPartition.readSkinPartition(nif, skin.skinPartitionRef);
-            ArrayList<Vertex> baseVertices = chooseExportVertices(partition);
-            ArrayList<UV> baseUvs = chooseExportUvs(partition);
+            ArrayList<Vertex> baseVertices = Utils.chooseExportVertices(partition);
+            ArrayList<UV> baseUvs = Utils.chooseExportUvs(partition);
 
             // Base mesh goes directly in root folder
             File baseFile = new File(
                     outputFolder,
-                    safeFileName(shape.name) + ".obj"
+                    Utils.safeFileName(shape.name) + ".obj"
             );
 
 
@@ -104,7 +109,7 @@ public class Extractor {
             // Morphs go in per-shape folder
             File morphDir = new File(
                     outputFolder,
-                    safeFileName(shape.name)
+                    Utils.safeFileName(shape.name)
             );
 
             morphDir.mkdirs();
@@ -118,7 +123,7 @@ public class Extractor {
 
                 File morphFile = new File(
                         morphDir,
-                        safeFileName(morph.name) + ".obj"
+                        Utils.safeFileName(morph.name) + ".obj"
                 );
 
 
@@ -135,48 +140,9 @@ public class Extractor {
             }
             System.out.println(" "+ triShape.name + " extracted");
         }
-        System.out.println(" Extraction Complete");
+        Utils.print(strings.extractionComplete());
     }
 
-    private static ArrayList<Vertex> chooseExportVertices(NiSkinPartition partition) {
-        int maxFaceIndex = getMaxFaceIndex(partition.faces);
-
-        if (partition.objVertices != null
-                && !partition.objVertices.isEmpty()
-                && maxFaceIndex < partition.objVertices.size()) {
-            return partition.objVertices;
-        }
-
-        return partition.vertices;
-    }
-
-    private static ArrayList<UV> chooseExportUvs(NiSkinPartition partition) {
-        int maxFaceIndex = getMaxFaceIndex(partition.faces);
-
-        if (partition.objUvs != null
-                && !partition.objUvs.isEmpty()
-                && maxFaceIndex < partition.objUvs.size()) {
-            return partition.objUvs;
-        }
-
-        return partition.uvs;
-    }
-
-    private static int getMaxFaceIndex(ArrayList<Face> faces) {
-        int max = -1;
-
-        for (Face f : faces) {
-            max = Math.max(max, f.a);
-            max = Math.max(max, f.b);
-            max = Math.max(max, f.c);
-        }
-
-        return max;
-    }
-
-    private static String safeFileName(String name) {
-        return name.replaceAll("[\\\\/:*?\"<>|]", "_");
-    }
 
 
     public static String stripExtension(String fileName) {

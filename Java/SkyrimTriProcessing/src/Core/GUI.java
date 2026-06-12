@@ -1,16 +1,25 @@
+package Core;
+
+import Lang.Localisation;
+import Lang.Strings;
+import Tri.TriType;
+import Tri.TriTypes;
+
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 
 public class GUI extends Component {
-
+    private static final Strings strings = Localisation.getStrings();
+    public static String versionNumber = "1.0.0";
     public static File triFile;
     public static File nifFile;
     public static File outputFolder;
-    static JTextArea consoleOutput = new JTextArea();
+    public static JTextArea consoleOutput = new JTextArea();
     static JScrollPane scroll = new JScrollPane(consoleOutput);
 
     public static void createGUI(){
@@ -19,25 +28,25 @@ public class GUI extends Component {
         JFrame.setDefaultLookAndFeelDecorated(true);
 
         Font f = new Font("serif", Font.PLAIN, 18);
-        window.setTitle("Tri Toolkit - Version 1.0.0");
+        window.setTitle(strings.appTitle() + versionNumber);
 
-        JLabel modeLabel = new JLabel("Select Mode: ");
-        JRadioButton faceGenMode = new JRadioButton("FaceGen Tri File");
-        JRadioButton bodyslideMode = new JRadioButton("Bodyslide Tri File", true);
+        JLabel modeLabel = new JLabel(strings.modeSelect());
+        JRadioButton faceGenMode = new JRadioButton(strings.faceGenButton());
+        JRadioButton bodyslideMode = new JRadioButton(strings.bodyslideButton(), true);
 
-        JLabel triFileLabel = new JLabel("Select Tri File: ");
+        JLabel triFileLabel = new JLabel(strings.selectTri());
         JTextField triFileText = new JTextField();
-        JButton triFileButton = new JButton("Open");
+        JButton triFileButton = new JButton(strings.openButton());
 
-        JLabel nifFileLabel = new JLabel("Select Nif File: ");
+        JLabel nifFileLabel = new JLabel(strings.selectNif());
         JTextField nifFileText = new JTextField();
-        JButton nifFileButton = new JButton("Open");
+        JButton nifFileButton = new JButton(strings.openButton());
 
-        JLabel outputFolderLabel = new JLabel("Select Output Folder: ");
+        JLabel outputFolderLabel = new JLabel(strings.selectOutput());
         JTextField outputFolderText = new JTextField();
-        JButton outputFolderButton = new JButton("Open");
+        JButton outputFolderButton = new JButton(strings.openButton());
 
-        JButton extractButton = new JButton("Extract!");
+        JButton extractButton = new JButton(strings.run());
 
         consoleOutput.setLineWrap(true);
         window.getContentPane().add(scroll);
@@ -48,7 +57,7 @@ public class GUI extends Component {
         modeGroup.add(bodyslideMode);
         modeGroup.add(faceGenMode);
 
-        // Dealing with the GUI elements
+        // Dealing with the Core.GUI elements
         // Select a reasonable base Y, add the height, plus 5-10. In this case, it's 25, + 10. So add 35.
         modeLabel.setBounds(25, 45, 250, 25);
         bodyslideMode.setBounds(200, 45, 200, 25);
@@ -128,14 +137,20 @@ public class GUI extends Component {
 
 
 
-
         ActionListener extractEvent = e ->{
             if (faceGenMode.isSelected()) {
-                runExtractor(extractButton, null, triFile, outputFolder, true);
+                try {
+                    runExtractor(extractButton, null, triFile, outputFolder, true);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
             } else {
-                runExtractor(extractButton, nifFile, triFile, outputFolder, false);
+                try {
+                    runExtractor(extractButton, nifFile, triFile, outputFolder, false);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
-
         };
 
 
@@ -170,12 +185,12 @@ public class GUI extends Component {
         triFileText.setEditable(false);
         nifFileText.setEditable(false);
         outputFolderText.setEditable(false);
-        bodyslideMode.setToolTipText("Click this button if you're extracting a BodySlide export, or a body mesh. Needs a NIF and a TRI file.");
-        faceGenMode.setToolTipText("Click this if you're wanting to extract a facegen related tri file.");
-        triFileText.setToolTipText("The path to your tri file, click the open button and navigate to it.");
-        nifFileText.setToolTipText("The path to your nif file, click the open button and navigate to it.");
-        outputFolderText.setToolTipText("Where the extractor puts all the files. Click the open button to set it.");
-        scroll.setToolTipText("This is the big ol' window where any output goes. Progress, extracted files, errors, and more!");
+        bodyslideMode.setToolTipText(strings.bodyslideModeTooltip());
+        faceGenMode.setToolTipText(strings.facegenModeTooltip());
+        triFileText.setToolTipText(strings.triFileTextTooltip());
+        nifFileText.setToolTipText(strings.nifFileTextTooltip());
+        outputFolderText.setToolTipText(strings.outputFolderTextTooltip());
+        scroll.setToolTipText(strings.scrollWindowTooltip());
 
         consoleOutput.setEditable(false);
 
@@ -205,14 +220,32 @@ public class GUI extends Component {
         window.setVisible(true);// making the frame visible
     }
 
-    public static void runExtractor(JButton extractButton, File nifFile, File triFile, File outputFolder, boolean  isFaceGen){
+    public static void runExtractor(JButton extractButton, File nifFile, File triFile, File outputFolder, boolean  isFaceGen) throws IOException {
         if(nifFile != null){
             if (!confirmPossibleMismatch(triFile, nifFile)) {
                 return;
             }
         }
 
+
         if(triFile != null & outputFolder != null){
+            TriType detectedType = TriTypes.detect(triFile);
+
+            if (isFaceGen && detectedType != TriType.FACEGEN) {
+                showTypeMismatchWarning("FaceGen", detectedType);
+                return;
+            } else{
+                if (detectedType != TriType.BODYSLIDE) {
+                    showTypeMismatchWarning("BodySlide", detectedType);
+                    return;
+                }
+            }
+
+            if (!confirmOutputFolder(outputFolder)) {
+                return;
+            }
+
+
             extractButton.setEnabled(false);
             SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
                 @Override
@@ -252,13 +285,25 @@ public class GUI extends Component {
         }
     }
 
+    private static void showTypeMismatchWarning(String selectedMode, TriType detectedType) {
+        JOptionPane.showMessageDialog(
+                null,
+                "The selected TRI does not match the chosen mode.\n\n"
+                        + "Selected mode: " + selectedMode + "\n"
+                        + "Detected TRI type: " + detectedType + "\n\n"
+                        + "Please choose the correct mode or select a different TRI file.",
+                "TRI Type Mismatch",
+                JOptionPane.WARNING_MESSAGE
+        );
+    }
+
 
     public static boolean confirmPossibleMismatch(File triFile, File nifFile) {
-        String triBase = stripExtension(triFile.getName());
-        String nifBase = stripExtension(nifFile.getName());
+        String triBase = Utils.stripExtension(triFile.getName());
+        String nifBase = Utils.stripExtension(nifFile.getName());
 
-        String normalizedTri = normalizeMeshName(triBase);
-        String normalizedNif = normalizeMeshName(nifBase);
+        String normalizedTri = Utils.normalizeMeshName(triBase);
+        String normalizedNif = Utils.normalizeMeshName(nifBase);
 
         if (normalizedTri.equalsIgnoreCase(normalizedNif)) {
             return true;
@@ -278,22 +323,30 @@ public class GUI extends Component {
         return result == JOptionPane.YES_OPTION;
     }
 
+    private static boolean confirmOutputFolder(File outputFolder) {
 
-    private static String stripExtension(String name) {
-        int dot = name.lastIndexOf('.');
-
-        if (dot <= 0) {
-            return name;
+        if (!outputFolder.exists()) {
+            return true;
         }
 
-        return name.substring(0, dot);
-    }
+        File[] files = outputFolder.listFiles();
 
-    private static String normalizeMeshName(String name) {
-        return name
-                .replaceAll("(?i)_0$", "")
-                .replaceAll("(?i)_1$", "")
-                .replaceAll("[_\\-\\s]", "")
-                .toLowerCase();
+        if (files == null || files.length == 0) {
+            return true;
+        }
+
+        int result = JOptionPane.showConfirmDialog(
+                null,
+                "The output folder already contains files.\n\n"
+                        + outputFolder.getAbsolutePath()
+                        + "\n\n"
+                        + "Existing files may be overwritten.\n\n"
+                        + "Continue?",
+                "Output Folder Not Empty",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE
+        );
+
+        return result == JOptionPane.YES_OPTION;
     }
 }
