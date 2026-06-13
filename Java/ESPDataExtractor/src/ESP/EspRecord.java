@@ -9,6 +9,7 @@ public class EspRecord extends EspElement {
     public int versionControlInfo;
     public int version;
     public int unknown;
+    public boolean compressed;
 
     public ArrayList<EspSubrecord> subrecords = new ArrayList<EspSubrecord>();
 

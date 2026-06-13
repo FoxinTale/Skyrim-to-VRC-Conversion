@@ -100,10 +100,6 @@ public class BlockReader {
         return Float.intBitsToFloat(f);
     }
 
-    public void seek(int position) {
-        this.pos = position;
-    }
-
     public String readAscii(int length) {
         String text = new String(data, pos, length, StandardCharsets.US_ASCII);
         pos += length;

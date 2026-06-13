@@ -16,7 +16,6 @@ public class BinaryReader {
             if (read == -1) {
                 throw new EOFException("Unexpected EOF while reading " + label);
             }
-
             offset += read;
         }
 

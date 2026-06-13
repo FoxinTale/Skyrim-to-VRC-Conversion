@@ -3,44 +3,12 @@ package Core;
 import Geometry.Face;
 import Geometry.UV;
 import Geometry.Vertex;
-import NifData.NiSkinPartition;
-import NifData.NifMesh;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Locale;
 
 public class ObjWriter {
-
-    public static void writeMesh(File outFile, NifMesh mesh) throws IOException {
-        try (PrintWriter out = new PrintWriter(new FileWriter(outFile))) {
-            write(out, mesh.name, mesh.vertices, mesh.faces);
-        }
-    }
-
-    public static void writePartition(
-            File outFile,
-            NiSkinPartition partition,
-            String objectName
-    ) throws IOException {
-
-        ArrayList<Vertex> verts =
-                !partition.objVertices.isEmpty()
-                        ? partition.objVertices
-                        : partition.vertices;
-
-        ArrayList<UV> uvs =
-                !partition.objUvs.isEmpty()
-                        ? partition.objUvs
-                        : partition.uvs;
-
-        try (PrintWriter out = new PrintWriter(new FileWriter(outFile))) {
-            write(out, objectName, verts, partition.faces, uvs);
-        }
-    }
 
     static void write(
             PrintWriter out,

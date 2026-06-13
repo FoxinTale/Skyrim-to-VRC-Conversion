@@ -1,7 +1,7 @@
 package Lang;
 
 public interface Strings {
-    // Main GUI.
+    // Main GUI. See StringsEN or the blank file for a complete, organised breakdown of what this all is.
     String appTitle();
     String selectTri();
     String selectNif();
@@ -28,5 +28,16 @@ public interface Strings {
     String noTriForMesh();
     String wrote();
     String forShape();
+    String extracted();
     String extractionComplete();
+
+
+    // Errors
+
+    // Errors thrown by the FaceGen Tri Reader.
+    String unsupportedFacegenTriError();
+    String labelledVertsError();
+    String labelledVerts();
+    String labelledPointsError();
+    String labelledPoints();
 }

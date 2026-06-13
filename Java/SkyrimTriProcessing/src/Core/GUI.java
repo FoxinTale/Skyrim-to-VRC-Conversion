@@ -13,16 +13,19 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 
+import static Core.Utils.stripExtension;
+
 public class GUI extends Component {
     private static final Strings strings = Localisation.getStrings();
     public static String versionNumber = "1.0.0";
     public static File triFile;
     public static File nifFile;
     public static File outputFolder;
+    public static JTextField outputFolderText = new JTextField();
     public static JTextArea consoleOutput = new JTextArea();
     static JScrollPane scroll = new JScrollPane(consoleOutput);
 
-    public static void createGUI(){
+    public static void createGUI() {
         JFrame window = new JFrame();
         window.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         JFrame.setDefaultLookAndFeelDecorated(true);
@@ -43,7 +46,6 @@ public class GUI extends Component {
         JButton nifFileButton = new JButton(strings.openButton());
 
         JLabel outputFolderLabel = new JLabel(strings.selectOutput());
-        JTextField outputFolderText = new JTextField();
         JButton outputFolderButton = new JButton(strings.openButton());
 
         JButton extractButton = new JButton(strings.run());
@@ -93,7 +95,7 @@ public class GUI extends Component {
             triFileSelect.setCurrentDirectory(new File(System.getProperty("user.dir")));
 
             int triOption = triFileSelect.showOpenDialog(null);
-            if(triOption == JFileChooser.APPROVE_OPTION){
+            if (triOption == JFileChooser.APPROVE_OPTION) {
                 triFileText.setText(triFileSelect.getSelectedFile().getAbsolutePath());
                 triFile = triFileSelect.getSelectedFile();
             }
@@ -113,7 +115,7 @@ public class GUI extends Component {
             nifFileSelect.setCurrentDirectory(new File(System.getProperty("user.dir")));
             int nifOption = nifFileSelect.showOpenDialog(null);
 
-            if(nifOption == JFileChooser.APPROVE_OPTION){
+            if (nifOption == JFileChooser.APPROVE_OPTION) {
                 nifFileText.setText(nifFileSelect.getSelectedFile().getAbsolutePath());
                 nifFile = nifFileSelect.getSelectedFile();
             }
@@ -129,24 +131,23 @@ public class GUI extends Component {
             int folderOption = outputFolderSelect.showOpenDialog(null);
 
 
-            if(folderOption == JFileChooser.APPROVE_OPTION){
+            if (folderOption == JFileChooser.APPROVE_OPTION) {
                 outputFolderText.setText(outputFolderSelect.getSelectedFile().getAbsolutePath());
                 outputFolder = outputFolderSelect.getSelectedFile();
             }
         };
 
 
-
-        ActionListener extractEvent = e ->{
+        ActionListener extractEvent = e -> {
             if (faceGenMode.isSelected()) {
                 try {
-                    runExtractor(extractButton, null, triFile, outputFolder, true);
+                    runExtractor(extractButton, null, triFile, true);
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
             } else {
                 try {
-                    runExtractor(extractButton, nifFile, triFile, outputFolder, false);
+                    runExtractor(extractButton, nifFile, triFile, false);
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -220,69 +221,66 @@ public class GUI extends Component {
         window.setVisible(true);// making the frame visible
     }
 
-    public static void runExtractor(JButton extractButton, File nifFile, File triFile, File outputFolder, boolean  isFaceGen) throws IOException {
-        if(nifFile != null){
-            if (!confirmPossibleMismatch(triFile, nifFile)) {
-                return;
-            }
+    public static void runExtractor(JButton extractButton, File nifFile, File triFile, boolean isFaceGen) throws IOException {
+        if (triFile == null) {
+            JOptionPane.showMessageDialog(
+                    null,
+                    "Please select a TRI file.",
+                    "Missing TRI File",
+                    JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
+        if(nifFile == null && !isFaceGen){
+            JOptionPane.showMessageDialog(
+                    null,
+                    "Please select a NIF file.",
+                    "Missing NIF File",
+                    JOptionPane.WARNING_MESSAGE
+            );
+            return;
         }
 
 
-        if(triFile != null & outputFolder != null){
-            TriType detectedType = TriTypes.detect(triFile);
+        TriType detectedType = TriTypes.detect(triFile);
 
-            if (isFaceGen && detectedType != TriType.FACEGEN) {
-                showTypeMismatchWarning("FaceGen", detectedType);
-                return;
-            } else{
-                if (detectedType != TriType.BODYSLIDE) {
-                    showTypeMismatchWarning("BodySlide", detectedType);
-                    return;
-                }
-            }
-
-            if (!confirmOutputFolder(outputFolder)) {
-                return;
-            }
-
-
-            extractButton.setEnabled(false);
-            SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
-                @Override
-                protected Void doInBackground() throws Exception {
-                    if(isFaceGen){
-                        Extractor.extractFaceGenTriFile(triFile, outputFolder);
-                    } else{
-                        Extractor.extractBodyslideTriFile(triFile, nifFile, outputFolder);
-                    }
-                    return null;
-                }
-
-                @Override
-                protected void done() {
-                    extractButton.setEnabled(true);
-
-                    try {
-                        get();
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                }
-            };
-            worker.execute();
+        if (isFaceGen && detectedType != TriType.FACEGEN) {
+            showTypeMismatchWarning("FaceGen", detectedType);
+            return;
         } else{
-            if(triFile == null){
-                System.out.println(" You need to set a TRI file");
-            }
-
-            if(nifFile == null){
-                System.out.println(" You need to set a NIF file");
-            }
-
-            if(outputFolder == null){
-                System.out.println(" You need to set an output folder.");
+            if (!isFaceGen && detectedType != TriType.BODYSLIDE) {
+                showTypeMismatchWarning("BodySlide", detectedType);
+                return;
             }
         }
+
+        File outputFolder = determineOutputFolder(triFile);
+        extractButton.setEnabled(false);
+
+        SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() throws Exception {
+                if (isFaceGen) {
+                    Extractor.extractFaceGenTriFile(triFile, outputFolder);
+                } else {
+                    Extractor.extractBodyslideTriFile(triFile, nifFile, outputFolder);
+                }
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                extractButton.setEnabled(true);
+
+                try {
+                    get();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        };
+        worker.execute();
     }
 
     private static void showTypeMismatchWarning(String selectedMode, TriType detectedType) {
@@ -299,8 +297,8 @@ public class GUI extends Component {
 
 
     public static boolean confirmPossibleMismatch(File triFile, File nifFile) {
-        String triBase = Utils.stripExtension(triFile.getName());
-        String nifBase = Utils.stripExtension(nifFile.getName());
+        String triBase = stripExtension(triFile.getName());
+        String nifBase = stripExtension(nifFile.getName());
 
         String normalizedTri = Utils.normalizeMeshName(triBase);
         String normalizedNif = Utils.normalizeMeshName(nifBase);
@@ -323,8 +321,22 @@ public class GUI extends Component {
         return result == JOptionPane.YES_OPTION;
     }
 
-    private static boolean confirmOutputFolder(File outputFolder) {
+    private static File determineOutputFolder(File triFile) {
+        String text = outputFolderText.getText();
 
+        if (text != null && !text.trim().isEmpty()) {
+            return new File(text.trim());
+        }
+
+        String triBaseName = stripExtension(triFile.getName());
+
+        return new File(
+                triFile.getParentFile(),
+                triBaseName
+        );
+    }
+
+    private static boolean confirmOutputFolder(File outputFolder) {
         if (!outputFolder.exists()) {
             return true;
         }
@@ -349,4 +361,7 @@ public class GUI extends Component {
 
         return result == JOptionPane.YES_OPTION;
     }
+
+
+
 }

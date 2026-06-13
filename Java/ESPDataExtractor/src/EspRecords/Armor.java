@@ -171,5 +171,17 @@ public class Armor {
             }
         }
     }
+
+    public static HashMap<Long, Armor> mapByFormId(
+            ArrayList<Armor> records
+    ) {
+        HashMap<Long, Armor> map = new HashMap<Long, Armor>();
+
+        for (Armor record : records) {
+            map.put(record.getFormId(), record);
+        }
+
+        return map;
+    }
     
 }

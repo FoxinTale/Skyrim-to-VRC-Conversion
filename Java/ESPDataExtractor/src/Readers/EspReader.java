@@ -5,6 +5,7 @@ import ESP.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.zip.Inflater;
 
 public class EspReader {
 
@@ -106,6 +107,7 @@ public class EspReader {
 
         record.dataStart = br.position();
         record.dataEnd = record.dataStart + size;
+        record.compressed = (record.flags & 0x00040000L) != 0;
 
         return record;
     }
@@ -114,18 +116,172 @@ public class EspReader {
             BinaryReader br,
             EspRecord record
     ) throws IOException {
+        if (record.compressed) {
+            return readCompressedSubrecords(br, record);
+        }
 
         ArrayList<EspSubrecord> subrecords =
                 new ArrayList<EspSubrecord>();
 
         br.seek(record.dataStart);
 
+        int extendedSize = -1;
+
         while (br.position() < record.dataEnd) {
+            long subStart = br.position();
+
             String type = br.readAscii(4);
             int size = br.readUInt16LE();
-            byte[] data = br.readBytes(size);
 
-            subrecords.add(new EspSubrecord(type, size, data));
+            if ("XXXX".equals(type)) {
+                byte[] sizeData = br.readBytes(size);
+
+                if (sizeData.length >= 4) {
+                    extendedSize = (int) readUInt32LE(sizeData, 0);
+                }
+
+                continue;
+            }
+
+            int actualSize = size;
+
+            if (extendedSize >= 0) {
+                actualSize = extendedSize;
+                extendedSize = -1;
+            }
+
+            if (br.position() + actualSize > record.dataEnd) {
+                throw new IOException(
+                        "Subrecord overruns record: " +
+                                record.type +
+                                " formId=0x" + Long.toHexString(record.formId) +
+                                " sub=" + type +
+                                " at=" + subStart +
+                                " size=" + actualSize +
+                                " recordEnd=" + record.dataEnd
+                );
+            }
+
+            byte[] data = br.readBytes(actualSize);
+
+            subrecords.add(new EspSubrecord(type, actualSize, data));
+        }
+
+        return subrecords;
+    }
+
+    private static ArrayList<EspSubrecord> readCompressedSubrecords(
+            BinaryReader br,
+            EspRecord record
+    ) throws IOException {
+
+        br.seek(record.dataStart);
+
+        long uncompressedSize = br.readUInt32LE();
+
+        byte[] compressedData =
+                br.readBytes((int)(record.size - 4));
+
+        byte[] data = decompressZlib(compressedData, (int) uncompressedSize);
+
+        return readSubrecordsFromBytes(data);
+    }
+
+
+    private static long readUInt32LE(byte[] data, int offset) {
+        return ((long) data[offset] & 0xFF)
+                | (((long) data[offset + 1] & 0xFF) << 8)
+                | (((long) data[offset + 2] & 0xFF) << 16)
+                | (((long) data[offset + 3] & 0xFF) << 24);
+    }
+
+    private static byte[] decompressZlib(byte[] compressedData, int expectedSize)
+            throws IOException {
+
+        Inflater inflater = new java.util.zip.Inflater();
+
+        inflater.setInput(compressedData);
+
+        byte[] output = new byte[expectedSize];
+
+        try {
+            int resultLength = inflater.inflate(output);
+
+            if (resultLength != expectedSize) {
+                throw new IOException(
+                        "Decompressed size mismatch. Expected " +
+                                expectedSize + " got " + resultLength
+                );
+            }
+
+            return output;
+
+        } catch (java.util.zip.DataFormatException e) {
+            throw new IOException("Invalid compressed record data", e);
+        } finally {
+            inflater.end();
+        }
+    }
+
+
+    private static ArrayList<EspSubrecord> readSubrecordsFromBytes(byte[] data)
+            throws IOException {
+
+        ArrayList<EspSubrecord> subrecords =
+                new ArrayList<EspSubrecord>();
+
+        int pos = 0;
+        int extendedSize = -1;
+
+        while (pos < data.length) {
+            if (pos + 6 > data.length) {
+                break;
+            }
+
+            String type = new String(data, pos, 4, "US-ASCII");
+            pos += 4;
+
+            int size =
+                    (data[pos] & 0xFF)
+                            | ((data[pos + 1] & 0xFF) << 8);
+            pos += 2;
+
+            if ("XXXX".equals(type)) {
+                if (pos + size > data.length) {
+                    break;
+                }
+
+                if (size >= 4) {
+                    extendedSize =
+                            ((data[pos] & 0xFF))
+                                    | ((data[pos + 1] & 0xFF) << 8)
+                                    | ((data[pos + 2] & 0xFF) << 16)
+                                    | ((data[pos + 3] & 0xFF) << 24);
+                }
+
+                pos += size;
+                continue;
+            }
+
+            int actualSize = size;
+
+            if (extendedSize >= 0) {
+                actualSize = extendedSize;
+                extendedSize = -1;
+            }
+
+            if (pos + actualSize > data.length) {
+                throw new IOException(
+                        "Subrecord overruns decompressed record: sub=" +
+                                type + " size=" + actualSize
+                );
+            }
+
+            byte[] subData = new byte[actualSize];
+            System.arraycopy(data, pos, subData, 0, actualSize);
+            pos += actualSize;
+
+            subrecords.add(new EspSubrecord(type, actualSize, subData));
         }
 
         return subrecords;

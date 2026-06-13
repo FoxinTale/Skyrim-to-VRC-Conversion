@@ -1,12 +1,18 @@
 package Readers;
 
+import Exceptions.UnsupportedFaceGenFeatureException;
+import Exceptions.UnsupportedTriFormatException;
 import Geometry.*;
+import Lang.Localisation;
+import Lang.Strings;
 import Tri.FaceGenTriData;
 
 import java.io.*;
 import java.util.ArrayList;
 
 public class FaceGenTriReader {
+    private static final Strings strings = Localisation.getStrings();
+
     public static FaceGenTriData read(File file) throws IOException {
         byte[] data = readAllBytes(file);
         BlockReader r = new BlockReader(data);
@@ -14,7 +20,9 @@ public class FaceGenTriReader {
         String magic = r.readAscii(8);
 
         if (!magic.equals("FRTRI003")) {
-            throw new IOException("Not a FaceGen TRI file. Magic was: " + magic);
+            throw new UnsupportedTriFormatException(strings.unsupportedFacegenTriError()
+                    + "Expected: FRTRI003\n"
+                    + "Found: " + magic);
         }
 
         int vertexCount = r.readI32();
@@ -25,8 +33,6 @@ public class FaceGenTriReader {
         int textureCoordCount = r.readI32();
         int extensionInfo = r.readI32();
         int diffMorphCount = r.readI32();
-        int statMorphCount = r.readI32();
-        int statMorphVertexCount = r.readI32();
 
         r.skip(16); // reserved
 
@@ -58,11 +64,12 @@ public class FaceGenTriReader {
         // Labelled vertices / surface points, not needed for OBJ export yet.
         // Leave as guarded skips until we map labels fully.
         if (labelledVertexCount > 0) {
-            throw new IOException("Labelled vertices not supported yet: " + labelledVertexCount);
+            throw new UnsupportedFaceGenFeatureException(strings.labelledVertsError()
+                    + strings.labelledVerts() + labelledVertexCount);
         }
-
         if (labelledSurfacePointCount > 0) {
-            throw new IOException("Labelled surface points not supported yet: " + labelledSurfacePointCount);
+            throw new UnsupportedFaceGenFeatureException(strings.labelledPointsError()
+                    + strings.labelledPoints() + labelledSurfacePointCount);
         }
 
         ArrayList<UV> uvs = new ArrayList<>();

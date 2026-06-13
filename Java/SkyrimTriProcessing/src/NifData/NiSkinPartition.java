@@ -8,8 +8,6 @@ import Readers.BlockReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static Geometry.UV.looksLikeUv;
-
 
 public class NiSkinPartition {
     public int blockIndex;
@@ -27,37 +25,11 @@ public class NiSkinPartition {
     public ArrayList<Face> faces = new ArrayList<>();
     public ArrayList<Integer> bones = new ArrayList<>();
     public ArrayList<Integer> vertexMap = new ArrayList<>();
-    public ArrayList<Integer> stripLengths;
     public ArrayList<Vertex> objVertices;   // render/export vertex order
     public ArrayList<UV> uvs = new ArrayList<>();
     public ArrayList<UV> objUvs = new ArrayList<>();
 
-    public int numVertices;
-    public int numTriangles;
-    public int numBones;
-    public int numStrips;
-    public int numWeightsPerVertex;
     public int vertexBufferEnd;
-    public int lodLevel;
-
-    public boolean hasVertexMap;
-    public boolean hasVertexWeights;
-    public boolean hasFaces;
-    public boolean hasBoneIndices;
-
-    public boolean globalVb;
-
-
-    public NiSkinPartition(int blockIndex, float unknownFloat0, int numPartitions, int vertexDataSize, int vertexStride, int vertexCount, int vertexBufferStart, ArrayList<Vertex> vertices) {
-        this.blockIndex = blockIndex;
-        this.unknownFloat0 = unknownFloat0;
-        this.numPartitions = numPartitions;
-        this.vertexDataSize = vertexDataSize;
-        this.vertexStride = vertexStride;
-        this.vertexCount = vertexCount;
-        this.vertexBufferStart = vertexBufferStart;
-        this.vertices = vertices;
-    }
 
     public NiSkinPartition() {
 
@@ -119,15 +91,8 @@ public class NiSkinPartition {
                 float u = ur.readF16();
                 float v = ur.readF16();
 
-/*                if (!looksLikeUv(u, v)) {
-                    u = 0.0f;
-                    v = 0.0f;
-                }*/
-
-    //            uvs.add(new UV(u, v));
                 uvs.add(new UV(u, 1.0f - v));
             } else {
-    //            uvs.add(new UV(0.0f, 0.0f));
                 System.out.println(uvOffset);
             }
         }

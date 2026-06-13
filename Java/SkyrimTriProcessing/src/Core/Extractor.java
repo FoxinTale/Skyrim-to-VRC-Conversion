@@ -136,9 +136,9 @@ public class Extractor {
                             partition.faces
                     );
                 }
-                System.out.println(" Wrote " + morph.name + " for shape " + triShape.name + ".");
+                Utils.print(strings.wrote() + morph.name + strings.forShape() + triShape.name + ".");
             }
-            System.out.println(" "+ triShape.name + " extracted");
+            Utils.print(triShape.name + strings.extracted());
         }
         Utils.print(strings.extractionComplete());
     }
@@ -147,7 +147,6 @@ public class Extractor {
 
     public static String stripExtension(String fileName) {
         int dot = fileName.lastIndexOf('.');
-
         if (dot <= 0) {
             return fileName;
         }

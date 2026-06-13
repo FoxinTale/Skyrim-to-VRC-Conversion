@@ -26,7 +26,4 @@ public class NifHeader {
     public int stringCount;
     public int maxStringLength;
     public List<String> strings = new ArrayList<>();
-
-    public int groupCount;
-    public ArrayList<Long> groups = new ArrayList<>();
 }
