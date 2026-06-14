@@ -101,6 +101,14 @@ public class BlockReader {
     }
 
     public String readAscii(int length) {
+        if (length < 0 || pos + length > data.length) {
+            throw new IndexOutOfBoundsException(
+                    "readAscii out of bounds: pos=" + pos
+                            + " length=" + length
+                            + " fileSize=" + data.length
+            );
+        }
+
         String text = new String(data, pos, length, StandardCharsets.US_ASCII);
         pos += length;
         return text;

@@ -17,7 +17,20 @@ public interface Strings {
     String triFileTextTooltip();
     String nifFileTextTooltip();
     String outputFolderTextTooltip();
-    String scrollWindowTooltip();
+    String consoleWindowTooltip();
+
+
+    String selectTriFileMessage();
+    String selectTriFileTitle();
+    String selectNifFileMessage();
+    String selectNifFileTitle();
+    String outputFolderErrorMessage();
+    String outputFolderErrorTitle();
+    String triTypeMismatch01();
+    String triTypeMismatch02();
+    String triTypeMismatch03();
+    String triTypeMismatch04();
+    String triTypeMismatchTitle();
 
 
     String outputFolderNotEmpty();

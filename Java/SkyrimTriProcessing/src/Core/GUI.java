@@ -157,6 +157,7 @@ public class GUI extends Component {
 
         faceGenMode.addActionListener(e -> {
             nifFileText.setEnabled(false);
+            nifFileText.setText("");
             nifFileButton.setEnabled(false);
         });
 
@@ -191,7 +192,7 @@ public class GUI extends Component {
         triFileText.setToolTipText(strings.triFileTextTooltip());
         nifFileText.setToolTipText(strings.nifFileTextTooltip());
         outputFolderText.setToolTipText(strings.outputFolderTextTooltip());
-        scroll.setToolTipText(strings.scrollWindowTooltip());
+        consoleOutput.setToolTipText(strings.consoleWindowTooltip());
 
         consoleOutput.setEditable(false);
 
@@ -225,8 +226,8 @@ public class GUI extends Component {
         if (triFile == null) {
             JOptionPane.showMessageDialog(
                     null,
-                    "Please select a TRI file.",
-                    "Missing TRI File",
+                    strings.selectTriFileMessage(),
+                    strings.selectTriFileTitle(),
                     JOptionPane.WARNING_MESSAGE
             );
             return;
@@ -235,8 +236,8 @@ public class GUI extends Component {
         if(nifFile == null && !isFaceGen){
             JOptionPane.showMessageDialog(
                     null,
-                    "Please select a NIF file.",
-                    "Missing NIF File",
+                    strings.selectNifFileMessage(),
+                    strings.selectNifFileTitle(),
                     JOptionPane.WARNING_MESSAGE
             );
             return;
@@ -245,17 +246,41 @@ public class GUI extends Component {
 
         TriType detectedType = TriTypes.detect(triFile);
 
+
         if (isFaceGen && detectedType != TriType.FACEGEN) {
             showTypeMismatchWarning("FaceGen", detectedType);
             return;
-        } else{
-            if (!isFaceGen && detectedType != TriType.BODYSLIDE) {
-                showTypeMismatchWarning("BodySlide", detectedType);
+        }
+        if (!isFaceGen && detectedType != TriType.BODYSLIDE) {
+            showTypeMismatchWarning("BodySlide", detectedType);
+            return;
+        }
+
+        if(nifFile != null){
+            if (!confirmPossibleMismatch(triFile, nifFile)) {
                 return;
             }
         }
 
+
         File outputFolder = determineOutputFolder(triFile);
+        if (!confirmOutputFolder(outputFolder)) {
+            return;
+        }
+
+        if (!outputFolder.exists()) {
+            if (!outputFolder.mkdirs()) {
+                JOptionPane.showMessageDialog(
+                        null,
+                        strings.outputFolderErrorMessage()
+                                + outputFolder.getAbsolutePath(),
+                        strings.outputFolderErrorTitle(),
+                        JOptionPane.ERROR_MESSAGE
+                );
+                return;
+            }
+        }
+
         extractButton.setEnabled(false);
 
         SwingWorker<Void, Void> worker = new SwingWorker<Void, Void>() {
@@ -286,11 +311,11 @@ public class GUI extends Component {
     private static void showTypeMismatchWarning(String selectedMode, TriType detectedType) {
         JOptionPane.showMessageDialog(
                 null,
-                "The selected TRI does not match the chosen mode.\n\n"
-                        + "Selected mode: " + selectedMode + "\n"
-                        + "Detected TRI type: " + detectedType + "\n\n"
-                        + "Please choose the correct mode or select a different TRI file.",
-                "TRI Type Mismatch",
+                strings.triTypeMismatch01()
+                        + strings.triTypeMismatch02() + selectedMode + "\n"
+                        + strings.triTypeMismatch03() + detectedType + "\n\n"
+                        + strings.triTypeMismatch04(),
+                strings.triTypeMismatchTitle(),
                 JOptionPane.WARNING_MESSAGE
         );
     }

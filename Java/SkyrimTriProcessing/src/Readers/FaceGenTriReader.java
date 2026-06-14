@@ -88,6 +88,10 @@ public class FaceGenTriReader {
 
         ArrayList<FaceGenMorph> morphs = new ArrayList<>();
 
+        System.out.println();
+
+        // Don't touch this. This one line missing breaks facegen extraction because it is off by 8 bytes.
+        r.skip(8);
         for (int m = 0; m < diffMorphCount; m++) {
             int nameLength = r.readI32();
             String name = r.readAscii(nameLength).trim();
